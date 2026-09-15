@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy-rgb: 27, 76, 120;
+  --white-rgb: 255, 255, 255;
+  --black-rgb: 0, 0, 0;
+  --line-rgb: 190, 215, 235;
+  --line-bright-rgb: 230, 244, 255;
+  --line-edge-rgb: 185, 210, 232;
+  --chrome-edge-rgb: 140, 198, 247;
+  --chrome-deep-rgb: 52, 120, 196;
+  --bloom-soft-rgb: 120, 178, 232;
+
+  --navy: rgb(var(--navy-rgb));
+  --white: rgb(var(--white-rgb));
+  --black: rgb(var(--black-rgb));
+
+  --silk-blue-1: #c8e4f8;
+  --silk-blue-2: #edf6ff;
+  --silk-blue-3: #a4cff0;
+  --silk-blue-deep: #7cb8e8;
+
+  --sky: #3f6aa6;
+  --sky-strong: #2e5189;
+  --mark-1: #5a7fb5;
+  --mark-2: #345a91;
+  --mark-3: #284875;
+
+  --chrome-ink: #1f4a74;
+  --ink: var(--navy);
+  --ink-body: rgba(var(--navy-rgb), 0.76);
+  --ink-muted: rgba(var(--navy-rgb), 0.55);
+  --ink-faint: rgba(var(--navy-rgb), 0.28);
+  --ink-line: rgba(var(--line-rgb), 0.55);
+  --ink-hair: rgba(var(--line-rgb), 0.35);
+
+  --surface: #eef3f9;
+  --paper: #f5f9fd;
+  --glass-clear: rgba(var(--white-rgb), 0.55);
+  --glass-clear-strong: rgba(var(--white-rgb), 0.85);
+
+  --max: 1320px;
+  --gx: max(24px, calc((100% - 1320px) / 2));
+  --cell: 64px;
+
+  --font-serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
+html {
+  scrollbar-gutter: stable;
+  background-color: var(--white);
+  color: var(--navy);
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--white);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lenis smooth scrolling rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Background Architectural Grid */
+.swiss-grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gx);
+  border-left: 1px solid var(--ink-hair);
+  border-right: 1px solid var(--ink-hair);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.swiss-grid-col {
+  border-right: 1px solid var(--ink-hair);
+  height: 100%;
+}
+
+.swiss-grid-col:last-child {
+  border-right: none;
+}
+
+/* Interactive Bracket Buttons [ Gallery ] */
+.bracket-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--glass-clear);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--navy);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 2px;
+}
+
+.bracket-btn:before {
+  content: "[";
+  display: inline-block;
+  margin-right: 4px;
+  transition: margin-right 0.25s ease;
+  color: var(--sky);
+}
+
+.bracket-btn:after {
+  content: "]";
+  display: inline-block;
+  margin-left: 4px;
+  transition: margin-left 0.25s ease;
+  color: var(--sky);
+}
+
+.bracket-btn:hover {
+  background: var(--glass-clear-strong);
+  color: var(--sky-strong);
+}
+
+.bracket-btn:hover:before {
+  margin-right: 12px;
+}
+
+.bracket-btn:hover:after {
+  margin-left: 12px;
+}
+
+/* Dynamic Adaptive Bracket Buttons for Nav */
+.bracket-adaptive-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--btn-bg, var(--glass-clear));
+  border: 1px solid var(--btn-border, rgba(27, 76, 120, 0.12));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--btn-text, var(--navy));
+  font-family: var(--font-sans);
+  font-size: 14px;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  border-radius: 2px;
+}
+
+.bracket-adaptive-btn:before {
+  content: "[";
+  display: inline-block;
+  margin-right: 4px;
+  transition: margin-right 0.25s ease, color 0.25s ease;
+  color: var(--btn-bracket, var(--sky));
+}
+
+.bracket-adaptive-btn:after {
+  content: "]";
+  display: inline-block;
+  margin-left: 4px;
+  transition: margin-left 0.25s ease, color 0.25s ease;
+  color: var(--btn-bracket, var(--sky));
+}
+
+.bracket-adaptive-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  filter: brightness(1.15);
+}
+
+.bracket-adaptive-btn:hover:before {
+  margin-right: 10px;
+}
+
+.bracket-adaptive-btn:hover:after {
+  margin-left: 10px;
+}
+
+/* Liquid Glass / Chrome Text Effect */
+.glass-line {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  background: linear-gradient(115deg, #fff0 30%, #fff4 45%, #baa8ff22, #fff0 64%, #0610243d, #fff0 88%),
+    linear-gradient(to bottom, #517fa9 8%, #224e76 24%, #092d4e 44%, #00203d 61%, #154775 76%, #396b97 84%, #275986 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: url(#chrome-lg) drop-shadow(0 2px 0 rgba(255, 255, 255, 0.45)) drop-shadow(0 12px 24px rgba(8, 16, 50, 0.06));
+}
+
+.glass-line:after {
+  content: attr(data-text);
+  opacity: 0.65;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: inherit;
+  pointer-events: none;
+  -webkit-text-stroke: 0 transparent;
+  text-shadow: none;
+  color: transparent;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 60%);
+  background-size: 250% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glass-sweep 9s ease-in-out infinite;
+}
+
+@keyframes glass-sweep {
+  0%, 55% {
+    background-position: 0% 0;
+  }
+  85%, 100% {
+    background-position: 100% 0;
+  }
+}
+
+/* Custom Scrollbar for inner widget panes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--navy-rgb), 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--navy-rgb), 0.3);
+}
