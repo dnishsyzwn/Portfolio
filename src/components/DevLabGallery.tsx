@@ -132,7 +132,7 @@ export default function DevLabGallery() {
             <span className="font-mono text-[10px] sm:text-[11px] text-[#6fa3d4] uppercase tracking-[0.2em] mb-1.5 block">
               02 / CURRICULUM &amp; ACHIEVEMENTS
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#ddeaf5] tracking-tight leading-none">
+            <h2 className="font-serif font-bold text-3xl sm:text-4xl md:text-5xl text-[#ddeaf5] tracking-tight leading-none">
               Moments &amp; Milestones
             </h2>
           </div>
@@ -179,7 +179,7 @@ export default function DevLabGallery() {
                     </div>
                   </div>
                 </div>
-                <h3 className="font-serif text-xl sm:text-2xl text-[#ddeaf5] mt-3.5 tracking-tight">
+                <h3 className="font-serif font-semibold text-xl sm:text-2xl text-[#ddeaf5] mt-3.5 tracking-tight">
                   {moments[0].title}
                 </h3>
                 <p className="font-sans text-xs text-[#9dbfd9]/70 mt-1">

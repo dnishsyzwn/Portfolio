@@ -30,7 +30,7 @@ module.exports = {
         surface: "#eef3f9",
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Meraki", "Source Serif Pro", "EB Garamond", "Georgia", "serif"],
+        serif: ["var(--font-serif)", "Plus Jakarta Sans", "Inter Tight", "Geist", "-apple-system", "sans-serif"],
         sans: ["var(--font-sans)", "Geist", "Inter", "system-ui", "-apple-system", "sans-serif"],
         mono: ["var(--font-mono)", "Geist Mono", "JetBrains Mono", "ui-monospace", "monospace"],
       },

@@ -8,12 +8,9 @@ export default function Footer() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-80px" });
 
-  const headlineWords = [
-    "Let's",
-    "build",
-    "something",
-    "exceptional",
-    "together.",
+  const headlineLines = [
+    ["Let's", "build", "something"],
+    ["exceptional", "together."],
   ];
 
   let cumulativeCharIdx = 0;
@@ -24,8 +21,8 @@ export default function Footer() {
         {/* Top Contact Callout */}
         <div ref={containerRef} className="mb-20">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 lg:gap-12">
-            {/* Left: Animated Eyebrow & Wave Headline */}
-            <div className="max-w-4xl">
+            {/* Left: Animated Eyebrow & Wave Headline (2 lines max) */}
+            <div className="max-w-4xl lg:max-w-5xl flex-1">
               {/* Eyebrow with blur-to-clear fade-in */}
               <motion.span
                 initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
@@ -43,53 +40,57 @@ export default function Footer() {
                 HAVE A SYSTEM TO BUILD?
               </motion.span>
 
-              {/* Main Headline with letter-by-letter wave and blur-to-clear */}
+              {/* Main Headline (Strictly 2 lines on desktop/tablet) */}
               <a
                 href="mailto:contact@danishsyazwan.dev"
-                className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-[#1b4c78] hover:text-[#2e5189] transition-colors leading-[0.95] tracking-tight block cursor-pointer"
+                className="font-serif font-bold text-3xl sm:text-5xl md:text-6xl lg:text-[62px] xl:text-[72px] text-[#1b4c78] hover:text-[#2e5189] transition-colors leading-[1.06] tracking-tight block cursor-pointer"
               >
-                {headlineWords.map((word, wordIdx) => (
-                  <span
-                    key={wordIdx}
-                    className="inline-block whitespace-nowrap"
-                  >
-                    {word.split("").map((char) => {
-                      const delay = 0.12 + cumulativeCharIdx++ * 0.022;
-                      return (
-                        <motion.span
-                          key={cumulativeCharIdx}
-                          initial={{
-                            opacity: 0,
-                            y: 38,
-                            filter: "blur(12px)",
-                          }}
-                          animate={
-                            isInView
-                              ? {
-                                  opacity: 1,
-                                  y: 0,
-                                  filter: "blur(0px)",
-                                }
-                              : {
-                                  opacity: 0,
-                                  y: 38,
-                                  filter: "blur(12px)",
-                                }
-                          }
-                          transition={{
-                            duration: 0.75,
-                            delay,
-                            ease: [0.16, 1, 0.3, 1],
-                          }}
-                          className="inline-block will-change-transform"
-                        >
-                          {char}
-                        </motion.span>
-                      );
-                    })}
-                    {wordIdx < headlineWords.length - 1 && (
-                      <span className="inline-block">&nbsp;</span>
-                    )}
+                {headlineLines.map((lineWords, lineIdx) => (
+                  <span key={lineIdx} className="block whitespace-normal">
+                    {lineWords.map((word, wordIdx) => (
+                      <span
+                        key={wordIdx}
+                        className="inline-block whitespace-nowrap"
+                      >
+                        {word.split("").map((char) => {
+                          const delay = 0.12 + cumulativeCharIdx++ * 0.022;
+                          return (
+                            <motion.span
+                              key={cumulativeCharIdx}
+                              initial={{
+                                opacity: 0,
+                                y: 38,
+                                filter: "blur(12px)",
+                              }}
+                              animate={
+                                isInView
+                                  ? {
+                                      opacity: 1,
+                                      y: 0,
+                                      filter: "blur(0px)",
+                                    }
+                                  : {
+                                      opacity: 0,
+                                      y: 38,
+                                      filter: "blur(12px)",
+                                    }
+                              }
+                              transition={{
+                                duration: 0.75,
+                                delay,
+                                ease: [0.16, 1, 0.3, 1],
+                              }}
+                              className="inline-block will-change-transform"
+                            >
+                              {char}
+                            </motion.span>
+                          );
+                        })}
+                        {wordIdx < lineWords.length - 1 && (
+                          <span className="inline-block">&nbsp;</span>
+                        )}
+                      </span>
+                    ))}
                   </span>
                 ))}
               </a>

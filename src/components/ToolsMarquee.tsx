@@ -4,124 +4,258 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { TextLineReveal } from "./MotionReveal";
 
+export interface TechLogo {
+  src: string;
+  alt: string;
+  invert?: boolean;
+}
+
 export interface TechItem {
   name: string;
   tag: string;
   category: string;
-  // Single clean logo for each stack item (Pinterest dashboard style)
-  logo: string;
+  logos: TechLogo[];
 }
 
 export const columns: TechItem[][] = [
-  // ── Column 1 (Moves UP slightly on scroll) ──────────────────────────────
+  // ── Column 1: Modern Web, React Ecosystem & Styling ────────────────────
   [
     {
       name: "Next.js",
-      tag: "v15 App Router",
-      category: "Full-Stack Web Framework",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg",
+      tag: "Full-Stack",
+      category: "React Framework & App Router",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg",
+          alt: "Next.js",
+        },
+      ],
     },
     {
       name: "TypeScript",
-      tag: "Strict Mode",
-      category: "Type-Safe Architecture",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
+      tag: "Strict Types",
+      category: "Typed JavaScript Architecture",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
+          alt: "TypeScript",
+        },
+      ],
     },
     {
-      name: "Java",
-      tag: "Java 21 / OOP",
-      category: "Enterprise Systems & Threading",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
+      name: "React & React Native",
+      tag: "Web & Mobile",
+      category: "Reactive Web & Cross-Platform Mobile",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+          alt: "React & React Native",
+        },
+      ],
     },
     {
       name: "Tailwind CSS",
-      tag: "v4.0 JIT",
+      tag: "Styling",
       category: "Utility-First Design Tokens",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+          alt: "Tailwind CSS",
+        },
+      ],
+    },
+    {
+      name: "CSS",
+      tag: "Styles",
+      category: "Responsive Layouts & Visuals",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg",
+          alt: "CSS3",
+        },
+      ],
     },
   ],
 
-  // ── Column 2 (Moves DOWN slightly on scroll) ────────────────────────────
+  // ── Column 2: Backend & Enterprise Systems ─────────────────────────────
   [
     {
-      name: "React",
-      tag: "v19 Runtime",
-      category: "Reactive UI & Component Tree",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+      name: "Java",
+      tag: "Core & OOP",
+      category: "Enterprise Systems & Multithreading",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
+          alt: "Java",
+        },
+      ],
     },
     {
       name: "Spring Boot",
-      tag: "Microservices",
-      category: "Distributed REST & SOAP APIs",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg",
+      tag: "Backend",
+      category: "Microservices & Distributed REST",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg",
+          alt: "Spring Boot",
+        },
+      ],
     },
     {
-      name: "MySQL",
-      tag: "Relational DB",
-      category: "Multi-Service Schema & SQL",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
+      name: "PHP",
+      tag: "Server-Side",
+      category: "Dynamic Web & Backend Engines",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/php/php-original.svg",
+          alt: "PHP",
+        },
+      ],
     },
     {
-      name: "RabbitMQ",
-      tag: "Async AMQP",
-      category: "Event Queues & Topic Exchanges",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rabbitmq/rabbitmq-original.svg",
-    },
-  ],
-
-  // ── Column 3 (Moves UP slightly on scroll) ──────────────────────────────
-  [
-    {
-      name: "C++",
-      tag: "Algorithms",
-      category: "Data Structures & Memory Control",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
-    },
-    {
-      name: "Docker",
-      tag: "Containers",
-      category: "Environment Isolation & DevOps",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg",
+      name: "Laravel",
+      tag: "MVC Framework",
+      category: "Eloquent ORM & Web Applications",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg",
+          alt: "Laravel",
+        },
+      ],
     },
     {
       name: "Node.js",
-      tag: "V8 Engine",
-      category: "Backend Execution Runtime",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg",
-    },
-    {
-      name: "Python",
-      tag: "Automation",
-      category: "Scripting & Data Processing",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+      tag: "Runtime",
+      category: "Event-Driven Server Execution",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg",
+          alt: "Node.js",
+        },
+      ],
     },
   ],
 
-  // ── Column 4 (Moves DOWN slightly on scroll) ────────────────────────────
+  // ── Column 3: Systems, .NET & Developer Tools ──────────────────────────
   [
     {
-      name: "Git & GitHub",
-      tag: "VCS / CI-CD",
-      category: "Version Control & Collaboration",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
+      name: "C#",
+      tag: "OOP & .NET",
+      category: "Strongly Typed Application Logic",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg",
+          alt: "C#",
+        },
+      ],
+    },
+    {
+      name: "ASP.NET",
+      tag: "Web Forms",
+      category: "Enterprise .NET Web Platforms",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dot-net/dot-net-original.svg",
+          alt: "ASP.NET",
+        },
+      ],
+    },
+    {
+      name: "C++",
+      tag: "Systems",
+      category: "Data Structures & Memory Control",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
+          alt: "C++",
+        },
+      ],
     },
     {
       name: "Postman",
       tag: "API QA",
-      category: "Endpoint & Payload Validation",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postman/postman-original.svg",
+      category: "Contract Testing & Verification",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postman/postman-original.svg",
+          alt: "Postman",
+        },
+      ],
     },
     {
-      name: "PostgreSQL",
-      tag: "ACID Storage",
-      category: "High-Throughput Relational DB",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+      name: "Git & GitHub",
+      tag: "VCS & CI/CD",
+      category: "Version Control & Collaboration",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
+          alt: "Git",
+        },
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg",
+          alt: "GitHub",
+          invert: true,
+        },
+      ],
+    },
+  ],
+
+  // ── Column 4: Databases & Web Foundations ──────────────────────────────
+  [
+    {
+      name: "MySQL",
+      tag: "Relational DB",
+      category: "Relational Schemas & SQL Queries",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
+          alt: "MySQL",
+        },
+      ],
+    },
+    {
+      name: "MongoDB",
+      tag: "NoSQL",
+      category: "Document Store & BSON Collections",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg",
+          alt: "MongoDB",
+        },
+      ],
+    },
+    {
+      name: "Firebase",
+      tag: "BaaS & Cloud",
+      category: "Realtime Database & Auth",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg",
+          alt: "Firebase",
+        },
+      ],
     },
     {
       name: "JavaScript",
       tag: "ESNext",
-      category: "Client-Side DOM & Interactivity",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+      category: "Interactive Client & Async Scripting",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+          alt: "JavaScript",
+        },
+      ],
+    },
+    {
+      name: "HTML",
+      tag: "Markup",
+      category: "Semantic Structure & DOM Tree",
+      logos: [
+        {
+          src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
+          alt: "HTML5",
+        },
+      ],
     },
   ],
 ];
@@ -137,16 +271,16 @@ export default function ToolsMarquee() {
 
   // ── Subtle Parallax Offsets on Scroll ────────────────────────────────────
   // Row/Column 1: Moves UP as user scrolls down
-  const col1Y = useTransform(scrollYProgress, [0, 1], [45, -45]);
+  const col1Y = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   // Row/Column 2: Moves DOWN as user scrolls down
-  const col2Y = useTransform(scrollYProgress, [0, 1], [-45, 45]);
+  const col2Y = useTransform(scrollYProgress, [0, 1], [-40, 40]);
 
   // Row/Column 3: Moves UP as user scrolls down
-  const col3Y = useTransform(scrollYProgress, [0, 1], [55, -55]);
+  const col3Y = useTransform(scrollYProgress, [0, 1], [45, -45]);
 
   // Row/Column 4: Moves DOWN as user scrolls down
-  const col4Y = useTransform(scrollYProgress, [0, 1], [-55, 55]);
+  const col4Y = useTransform(scrollYProgress, [0, 1], [-45, 45]);
 
   const colTransforms = [col1Y, col2Y, col3Y, col4Y];
 
@@ -170,7 +304,7 @@ export default function ToolsMarquee() {
               03 / TECHNICAL ARSENAL
             </span>
             <TextLineReveal>
-              <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#ddeaf5] tracking-tight leading-none">
+              <h2 className="font-serif font-bold text-4xl sm:text-5xl md:text-6xl text-[#ddeaf5] tracking-tight leading-none">
                 Tools &amp; Stack I Use
               </h2>
             </TextLineReveal>
@@ -184,7 +318,7 @@ export default function ToolsMarquee() {
               key={colIdx}
               style={{ y: colTransforms[colIdx] }}
               className={`flex flex-col gap-4 md:gap-6 will-change-transform ${
-                colIdx === 1 ? "md:pt-10" : colIdx === 3 ? "md:pt-16" : ""
+                colIdx === 1 ? "md:pt-10" : colIdx === 3 ? "md:pt-14" : ""
               }`}
             >
               {colItems.map((item, itemIdx) => (
@@ -192,14 +326,27 @@ export default function ToolsMarquee() {
                   key={itemIdx}
                   className="group relative w-full rounded-2xl md:rounded-3xl p-4 sm:p-5 bg-[#0e2238]/85 border border-[#1e456d]/50 hover:border-[#38bdf8]/60 hover:shadow-[0_12px_35px_-8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-y-2 cursor-pointer select-none flex flex-col justify-between"
                 >
-                  {/* Pinterest Top: Visual Logo Showcase (1 clean image, no hover swap) */}
-                  <div className="relative w-full aspect-[4/3] rounded-xl md:rounded-2xl bg-[#081320]/80 border border-[#1b3d60]/60 flex items-center justify-center p-5 overflow-hidden transition-all duration-300 group-hover:border-[#38bdf8]/40">
-                    <img
-                      src={item.logo}
-                      alt={item.name}
-                      loading="lazy"
-                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain drop-shadow-md transition-transform duration-300 ease-out group-hover:scale-110"
-                    />
+                  {/* Pinterest Top: Visual Logo Showcase (Single or paired images) */}
+                  <div className="relative w-full aspect-[4/3] rounded-xl md:rounded-2xl bg-[#081320]/80 border border-[#1b3d60]/60 flex items-center justify-center gap-3 sm:gap-4 md:gap-5 p-4 sm:p-5 overflow-hidden transition-all duration-300 group-hover:border-[#38bdf8]/40">
+                    {item.logos.map((logo, lIdx) => (
+                      <div key={lIdx} className="flex items-center gap-3 sm:gap-4 md:gap-5">
+                        {lIdx > 0 && (
+                          <span className="text-[#38bdf8]/35 font-mono text-xs sm:text-sm font-light select-none">
+                            +
+                          </span>
+                        )}
+                        <img
+                          src={logo.src}
+                          alt={logo.alt}
+                          loading="lazy"
+                          className={`object-contain drop-shadow-md transition-transform duration-300 ease-out group-hover:scale-110 ${
+                            item.logos.length > 1
+                              ? "w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12"
+                              : "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
+                          } ${logo.invert ? "brightness-0 invert" : ""}`}
+                        />
+                      </div>
+                    ))}
                   </div>
 
                   {/* Pinterest Bottom: Info & Tag Metadata */}

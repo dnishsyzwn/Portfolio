@@ -114,7 +114,7 @@ export default function WorkSection() {
           <div>
             <motion.h2
               style={{ color: headingColor }}
-              className="font-serif text-4xl sm:text-5xl md:text-[52px] tracking-tight leading-none"
+              className="font-serif font-bold text-4xl sm:text-5xl md:text-[52px] tracking-tight leading-none"
             >
               Work
             </motion.h2>
@@ -176,7 +176,7 @@ export default function WorkSection() {
                 {/* Title */}
                 <motion.h3
                   style={{ color: titleColor }}
-                  className="font-serif text-2xl sm:text-3xl tracking-tight leading-tight mt-4
+                  className="font-serif font-semibold text-2xl sm:text-3xl tracking-tight leading-tight mt-4
                              whitespace-pre-line"
                 >
                   {proj.title}

@@ -1,74 +1,357 @@
 "use client";
 
-export default function TopographyBackground() {
+import { useEffect, useRef } from "react";
+import { MotionValue } from "framer-motion";
+
+interface TopographyBackgroundProps {
+  scrollYProgress?: MotionValue<number>;
+}
+
+export default function TopographyBackground({ scrollYProgress }: TopographyBackgroundProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
+
+    let width = (canvas.width = Math.floor(window.innerWidth * dpr));
+    let height = (canvas.height = Math.floor(window.innerHeight * dpr));
+    let displayWidth = window.innerWidth;
+    let displayHeight = window.innerHeight;
+    ctx.scale(dpr, dpr);
+
+    let mouse = {
+      x: displayWidth * 0.5,
+      y: displayHeight * 0.5,
+      targetX: displayWidth * 0.5,
+      targetY: displayHeight * 0.5,
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.targetX = e.clientX;
+      mouse.targetY = e.clientY;
+    };
+
+    const handleResize = () => {
+      displayWidth = window.innerWidth;
+      displayHeight = window.innerHeight;
+      width = canvas.width = Math.floor(displayWidth * dpr);
+      height = canvas.height = Math.floor(displayHeight * dpr);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("resize", handleResize);
+
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          cancelAnimationFrame(animId);
+          animId = requestAnimationFrame(render);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(canvas);
+
+    let time = 0;
+    let smoothScroll = 0;
+
+    // Helper: draw closed smooth loop with quadratic bezier through midpoints
+    const drawClosedSmoothLoop = (
+      points: { x: number; y: number }[],
+      strokeStyle: string,
+      lineWidth: number,
+      dash?: number[]
+    ) => {
+      if (points.length < 3) return;
+      ctx.save();
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
+      if (dash) ctx.setLineDash(dash);
+      else ctx.setLineDash([]);
+      ctx.beginPath();
+
+      const p0 = points[0];
+      const p1 = points[1];
+      ctx.moveTo((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+
+      for (let i = 1; i < points.length; i++) {
+        const curr = points[i];
+        const next = points[(i + 1) % points.length];
+        const midX = (curr.x + next.x) / 2;
+        const midY = (curr.y + next.y) / 2;
+        ctx.quadraticCurveTo(curr.x, curr.y, midX, midY);
+      }
+
+      // Close to first midpoint
+      const mid01X = (p0.x + p1.x) / 2;
+      const mid01Y = (p0.y + p1.y) / 2;
+      ctx.quadraticCurveTo(p0.x, p0.y, mid01X, mid01Y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    // Helper: draw open smooth curve across the canvas
+    const drawOpenSmoothCurve = (
+      points: { x: number; y: number }[],
+      strokeStyle: string,
+      lineWidth: number,
+      dash?: number[]
+    ) => {
+      if (points.length < 2) return;
+      ctx.save();
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
+      if (dash) ctx.setLineDash(dash);
+      else ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 1; i < points.length - 1; i++) {
+        const curr = points[i];
+        const next = points[i + 1];
+        const midX = (curr.x + next.x) / 2;
+        const midY = (curr.y + next.y) / 2;
+        ctx.quadraticCurveTo(curr.x, curr.y, midX, midY);
+      }
+      ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const render = () => {
+      if (!isVisible) return;
+
+      time += 0.007;
+
+      // Smooth scroll interpolation
+      const targetScroll = scrollYProgress ? scrollYProgress.get() : 0;
+      smoothScroll += (targetScroll - smoothScroll) * 0.08;
+
+      // Mouse smooth interpolation
+      mouse.x += (mouse.targetX - mouse.x) * 0.04;
+      mouse.y += (mouse.targetY - mouse.y) * 0.04;
+      const mouseNormX = (mouse.x / displayWidth - 0.5) * 40;
+      const mouseNormY = (mouse.y / displayHeight - 0.5) * 30;
+
+      // Total animated phase combined from continuous time + scroll displacement
+      const motionPhase = time + smoothScroll * 6.5;
+
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+      // ── PEAK 1: Major Mountain Summit (Center-Right) ──────────────────────
+      const peak1X = displayWidth * 0.72 + mouseNormX * 0.8;
+      const peak1Y = displayHeight * 0.48 + mouseNormY * 0.8;
+      const peak1Rings = 15;
+
+      for (let k = 1; k <= peak1Rings; k++) {
+        const baseRadius = 28 + k * 26;
+        const ringPoints: { x: number; y: number }[] = [];
+        const numSteps = 72;
+        const isIndex = k % 4 === 0;
+
+        for (let i = 0; i < numSteps; i++) {
+          const theta = (i / numSteps) * Math.PI * 2;
+
+          // Multi-frequency harmonic perturbation that flows over time and scroll
+          const warp1 = Math.sin(theta * 2 + motionPhase * 0.85 + k * 0.22) * (baseRadius * 0.12);
+          const warp2 = Math.cos(theta * 3 - motionPhase * 0.6 + k * 0.15) * (baseRadius * 0.07);
+          const warp3 = Math.sin(theta * 5 + motionPhase * 1.1 - k * 0.1) * (baseRadius * 0.035);
+
+          const r = baseRadius + warp1 + warp2 + warp3;
+          ringPoints.push({
+            x: peak1X + Math.cos(theta) * r,
+            y: peak1Y + Math.sin(theta) * r,
+          });
+        }
+
+        const color = isIndex ? "rgba(27, 76, 120, 0.42)" : "rgba(30, 80, 130, 0.18)";
+        const width = isIndex ? 1.5 : 0.85;
+        drawClosedSmoothLoop(ringPoints, color, width);
+
+        // Draw elevation label on index contours
+        if (isIndex && ringPoints.length > 18) {
+          const labelPt = ringPoints[18];
+          ctx.save();
+          ctx.font = "9px monospace";
+          ctx.fillStyle = "rgba(27, 76, 120, 0.5)";
+          ctx.fillText(`+${k * 50}M`, labelPt.x + 3, labelPt.y - 3);
+          ctx.restore();
+        }
+      }
+
+      // Summit center mark
+      ctx.save();
+      ctx.strokeStyle = "rgba(27, 76, 120, 0.55)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(peak1X, peak1Y, 3.5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // ── PEAK 2: Secondary Elevation Dome (Bottom-Left) ────────────────────
+      const peak2X = displayWidth * 0.2 + mouseNormX * 0.5;
+      const peak2Y = displayHeight * 0.74 + mouseNormY * 0.5;
+      const peak2Rings = 11;
+
+      for (let k = 1; k <= peak2Rings; k++) {
+        const baseRadius = 24 + k * 22;
+        const ringPoints: { x: number; y: number }[] = [];
+        const numSteps = 64;
+        const isIndex = k % 4 === 0;
+
+        for (let i = 0; i < numSteps; i++) {
+          const theta = (i / numSteps) * Math.PI * 2;
+          const warp1 = Math.sin(theta * 2 - motionPhase * 0.75 + k * 0.2) * (baseRadius * 0.14);
+          const warp2 = Math.cos(theta * 3 + motionPhase * 0.5 - k * 0.12) * (baseRadius * 0.08);
+
+          const r = baseRadius + warp1 + warp2;
+          ringPoints.push({
+            x: peak2X + Math.cos(theta) * r,
+            y: peak2Y + Math.sin(theta) * r,
+          });
+        }
+
+        const color = isIndex ? "rgba(27, 76, 120, 0.38)" : "rgba(30, 80, 130, 0.16)";
+        const width = isIndex ? 1.4 : 0.8;
+        drawClosedSmoothLoop(ringPoints, color, width);
+      }
+
+      // ── PEAK 3: Upper-Right High Plateau ──────────────────────────────────
+      const peak3X = displayWidth * 0.86 + mouseNormX * 0.3;
+      const peak3Y = displayHeight * 0.14 + mouseNormY * 0.3;
+      const peak3Rings = 7;
+
+      for (let k = 1; k <= peak3Rings; k++) {
+        const baseRadius = 20 + k * 20;
+        const ringPoints: { x: number; y: number }[] = [];
+        const numSteps = 56;
+        const isIndex = k % 3 === 0;
+
+        for (let i = 0; i < numSteps; i++) {
+          const theta = (i / numSteps) * Math.PI * 2;
+          const warp1 = Math.sin(theta * 2 + motionPhase * 0.6 + k * 0.25) * (baseRadius * 0.11);
+          const r = baseRadius + warp1;
+          ringPoints.push({
+            x: peak3X + Math.cos(theta) * r,
+            y: peak3Y + Math.sin(theta) * r,
+          });
+        }
+
+        const color = isIndex ? "rgba(27, 76, 120, 0.32)" : "rgba(30, 80, 130, 0.14)";
+        const width = isIndex ? 1.3 : 0.75;
+        drawClosedSmoothLoop(ringPoints, color, width);
+      }
+
+      // ── TRANSVERSE RIDGELINES: Sweeping Terrain Contours Across Canvas ────
+      const numRidges = 15;
+      const stepX = 28;
+
+      for (let j = 0; j < numRidges; j++) {
+        const baseY = (j / (numRidges - 1)) * (displayHeight + 200) - 100;
+        const ridgePoints: { x: number; y: number }[] = [];
+        const isIndex = j % 4 === 0;
+
+        for (let x = -60; x <= displayWidth + 60; x += stepX) {
+          // Broad natural terrain wave
+          const wave1 = Math.sin(x * 0.0022 + motionPhase * 0.7 + j * 0.38) * 38;
+          const wave2 = Math.cos(x * 0.0045 - motionPhase * 0.5 - j * 0.22) * 20;
+
+          // Deflection around Peak 1
+          const d1x = x - peak1X;
+          const d1y = baseY - peak1Y;
+          const dist1 = Math.sqrt(d1x * d1x + d1y * d1y);
+          let deflect1 = 0;
+          if (dist1 < 380) {
+            const factor = Math.pow(1 - dist1 / 380, 2);
+            deflect1 = (d1y >= 0 ? 1 : -1) * factor * 55;
+          }
+
+          // Deflection around Peak 2
+          const d2x = x - peak2X;
+          const d2y = baseY - peak2Y;
+          const dist2 = Math.sqrt(d2x * d2x + d2y * d2y);
+          let deflect2 = 0;
+          if (dist2 < 260) {
+            const factor = Math.pow(1 - dist2 / 260, 2);
+            deflect2 = (d2y >= 0 ? 1 : -1) * factor * 40;
+          }
+
+          const y = baseY + wave1 + wave2 + deflect1 + deflect2;
+          ridgePoints.push({ x, y });
+        }
+
+        const color = isIndex ? "rgba(27, 76, 120, 0.34)" : "rgba(30, 80, 130, 0.15)";
+        const width = isIndex ? 1.3 : 0.75;
+        drawOpenSmoothCurve(ridgePoints, color, width);
+      }
+
+      // ── VALLEY / FAULT CONTOUR (Dashed lines winding across saddle) ────────
+      const faultPoints: { x: number; y: number }[] = [];
+      for (let y = -50; y <= displayHeight + 50; y += 30) {
+        const x =
+          displayWidth * 0.44 +
+          Math.sin(y * 0.003 + motionPhase * 0.6) * 90 +
+          Math.cos(y * 0.007 - motionPhase * 0.4) * 45;
+        faultPoints.push({ x, y });
+      }
+      drawOpenSmoothCurve(faultPoints, "rgba(56, 189, 248, 0.35)", 1.2, [6, 6]);
+
+      // ── MINIMAL CARTOGRAPHIC RETICLE / ANNOTATIONS ────────────────────────
+      ctx.save();
+      ctx.fillStyle = "rgba(27, 76, 120, 0.45)";
+      ctx.font = "10px monospace";
+      ctx.fillText("LAT 03°08'N · LON 101°41'E", 40, 50);
+      ctx.fillText("TERRAIN CONTOURS // DYNAMIC ELEVATION", 40, 66);
+      ctx.fillText("CONTOUR INT: 25M", displayWidth - 170, displayHeight - 40);
+
+      // Delicate grid crosses (+)
+      const crossCoords = [
+        { x: displayWidth * 0.12, y: displayHeight * 0.22 },
+        { x: displayWidth * 0.48, y: displayHeight * 0.18 },
+        { x: displayWidth * 0.42, y: displayHeight * 0.82 },
+        { x: displayWidth * 0.88, y: displayHeight * 0.85 },
+      ];
+      ctx.strokeStyle = "rgba(27, 76, 120, 0.3)";
+      ctx.lineWidth = 1;
+      crossCoords.forEach(({ x, y }) => {
+        ctx.beginPath();
+        ctx.moveTo(x - 5, y);
+        ctx.lineTo(x + 5, y);
+        ctx.moveTo(x, y - 5);
+        ctx.lineTo(x, y + 5);
+        ctx.stroke();
+      });
+      ctx.restore();
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(animId);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [scrollYProgress]);
+
   return (
-    <svg
-      className="w-full h-full object-cover pointer-events-none select-none opacity-80"
-      viewBox="0 0 1440 900"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <defs>
-        <linearGradient id="topo-fade" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1b4c78" stopOpacity="0.22" />
-          <stop offset="50%" stopColor="#3f6aa6" stopOpacity="0.14" />
-          <stop offset="100%" stopColor="#7cb8e8" stopOpacity="0.18" />
-        </linearGradient>
-
-        <linearGradient id="topo-index" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1b4c78" stopOpacity="0.32" />
-          <stop offset="100%" stopColor="#2e5189" stopOpacity="0.22" />
-        </linearGradient>
-      </defs>
-
-      {/* Cluster 1: Top-Left Elevation Ridges */}
-      <g stroke="url(#topo-fade)" strokeWidth="1" strokeLinecap="round">
-        <path d="M-80 120 C 140 80, 260 220, 380 160 C 500 100, 480 -60, 620 -80" />
-        <path d="M-60 180 C 160 140, 290 280, 420 220 C 540 160, 530 -20, 680 -40" />
-        <path d="M-40 240 C 180 200, 320 340, 460 280 C 580 220, 580 20, 740 0" stroke="url(#topo-index)" strokeWidth="1.5" />
-        <path d="M-20 300 C 200 260, 350 400, 500 340 C 620 280, 630 60, 800 40" />
-        <path d="M 0 360 C 220 320, 380 460, 540 400 C 660 340, 680 100, 860 80" />
-        <path d="M 20 420 C 240 380, 410 520, 580 460 C 700 400, 730 140, 920 120" stroke="url(#topo-index)" strokeWidth="1.5" />
-        <path d="M 40 480 C 260 440, 440 580, 620 520 C 740 460, 780 180, 980 160" />
-      </g>
-
-      {/* Cluster 2: Center-Right Concentric Plateau Formations */}
-      <g stroke="url(#topo-fade)" strokeWidth="1" strokeLinecap="round">
-        {/* Outermost ring */}
-        <path d="M 720 320 C 880 240, 1140 260, 1260 380 C 1380 500, 1340 680, 1200 760 C 1060 840, 840 800, 740 680 C 640 560, 620 380, 720 320 Z" stroke="url(#topo-index)" strokeWidth="1.5" />
-        {/* Ring 2 */}
-        <path d="M 770 360 C 900 300, 1100 310, 1200 400 C 1300 500, 1270 640, 1160 700 C 1040 760, 870 740, 790 640 C 710 540, 690 400, 770 360 Z" />
-        {/* Ring 3 */}
-        <path d="M 820 400 C 930 350, 1070 360, 1140 430 C 1220 500, 1200 600, 1110 650 C 1020 700, 890 680, 830 600 C 770 520, 750 430, 820 400 Z" />
-        {/* Ring 4 (Peak) */}
-        <path d="M 870 440 C 950 400, 1030 400, 1080 450 C 1140 500, 1120 570, 1060 600 C 990 640, 910 620, 870 560 C 830 500, 820 460, 870 440 Z" stroke="url(#topo-index)" strokeWidth="1.5" />
-        {/* Summit center */}
-        <path d="M 920 475 C 970 450, 1010 460, 1035 485 C 1060 515, 1050 545, 1015 565 C 975 585, 935 570, 915 540 C 895 510, 895 490, 920 475 Z" />
-      </g>
-
-      {/* Cluster 3: Bottom Sweeping Cartographic Fault Lines */}
-      <g stroke="url(#topo-fade)" strokeWidth="1" strokeLinecap="round">
-        <path d="M 220 980 C 440 780, 660 840, 880 720 C 1080 600, 1260 620, 1500 520" />
-        <path d="M 160 1020 C 390 830, 620 890, 840 770 C 1040 650, 1220 670, 1520 580" stroke="url(#topo-index)" strokeWidth="1.5" />
-        <path d="M 100 1060 C 340 880, 580 940, 800 820 C 1000 700, 1180 720, 1540 640" />
-        <path d="M 40 1100 C 290 930, 540 990, 760 870 C 960 750, 1140 770, 1560 700" />
-      </g>
-
-      {/* Cluster 4: Deep Sinuous River valley contours */}
-      <g stroke="url(#topo-fade)" strokeWidth="0.8" strokeDasharray="6 4">
-        <path d="M 460 -40 C 420 180, 540 320, 480 520 C 420 720, 240 820, 280 1040" />
-        <path d="M 520 -40 C 480 180, 600 320, 540 520 C 480 720, 300 820, 340 1040" />
-      </g>
-
-      {/* Cluster 5: Ambient fine elevation loops in corners */}
-      <g stroke="url(#topo-fade)" strokeWidth="0.9">
-        <path d="M 1100 -60 C 1220 60, 1340 80, 1480 20" />
-        <path d="M 1060 -20 C 1190 100, 1320 120, 1500 60" stroke="url(#topo-index)" strokeWidth="1.5" />
-        <path d="M 1020 20 C 1160 140, 1300 160, 1520 100" />
-        <path d="M 980 60 C 1130 180, 1280 200, 1540 140" />
-        <path d="M 940 100 C 1100 220, 1260 240, 1560 180" />
-      </g>
-    </svg>
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full object-cover pointer-events-none select-none"
+      aria-hidden="true"
+    />
   );
 }

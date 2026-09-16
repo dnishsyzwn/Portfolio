@@ -202,7 +202,7 @@ export default function SilkHero() {
           style={{ opacity: topoOpacity, scale: topoScale }}
           className="absolute inset-0 w-full h-full pointer-events-none z-0 will-change-transform"
         >
-          <TopographyBackground />
+          <TopographyBackground scrollYProgress={scrollYProgress} />
         </motion.div>
         {/* The Entire Hero Section Capsule that zooms out on scroll */}
         <motion.div
@@ -230,10 +230,10 @@ export default function SilkHero() {
             style={{ scale: textScale }}
             className="relative z-20 max-w-[1320px] mx-auto px-6 md:px-12 w-full pt-16 pb-12"
           >
-            <div className="max-w-4xl">
+            <div className="max-w-6xl">
               {/* Main Editorial Headline with Chrome Specular Light Effect & Staggered Rise */}
-              <h1 className="font-serif tracking-[-0.035em] text-[#1f4a74] text-5xl sm:text-7xl md:text-8xl lg:text-[96px] leading-[0.92] mb-8 select-none">
-                <div className="overflow-hidden">
+              <h1 className="font-serif font-bold tracking-[-0.035em] text-[#1f4a74] text-4xl sm:text-6xl md:text-7xl lg:text-[74px] xl:text-[82px] leading-[1.06] mb-8 select-none">
+                <div className="overflow-hidden py-1">
                   <motion.span
                     initial={{ y: "115%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -244,7 +244,7 @@ export default function SilkHero() {
                     Systems with soul.
                   </motion.span>
                 </div>
-                <div className="overflow-hidden mt-1">
+                <div className="overflow-hidden py-1 mt-0.5">
                   <motion.span
                     initial={{ y: "115%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
