@@ -2,8 +2,6 @@ import SilkHero from "@/components/SilkHero";
 import WorkSection from "@/components/WorkSection";
 import DevLabGallery from "@/components/DevLabGallery";
 import ToolsMarquee from "@/components/ToolsMarquee";
-import Testimonials from "@/components/Testimonials";
-import SynthesisGraph from "@/components/SynthesisGraph";
 
 export default function Home() {
   return (
@@ -19,12 +17,6 @@ export default function Home() {
 
       {/* 03 / Stack & Tools Infinite Marquee */}
       <ToolsMarquee />
-
-      {/* 04 / Endorsements & Testimonials */}
-      <Testimonials />
-
-      {/* 05 / Knowledge & Engineering Taxonomy Synthesis Graph */}
-      <SynthesisGraph />
     </div>
   );
 }

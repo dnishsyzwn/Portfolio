@@ -166,18 +166,16 @@ html.lenis body {
 .bracket-adaptive-btn {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  background: var(--btn-bg, var(--glass-clear));
-  border: 1px solid var(--btn-border, rgba(27, 76, 120, 0.12));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 8px;
+  background: var(--btn-bg, transparent);
+  border: 1px solid var(--btn-border, transparent);
   color: var(--btn-text, var(--navy));
   font-family: var(--font-sans);
   font-size: 14px;
   letter-spacing: -0.015em;
   line-height: 1.3;
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-  border-radius: 2px;
+  transition: color 0.25s ease, opacity 0.25s ease;
+  border-radius: 4px;
 }
 
 .bracket-adaptive-btn:before {
@@ -197,8 +195,7 @@ html.lenis body {
 }
 
 .bracket-adaptive-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  filter: brightness(1.15);
+  opacity: 0.8;
 }
 
 .bracket-adaptive-btn:hover:before {

@@ -291,7 +291,7 @@ export default function SilkHero() {
                 </a>
 
                 <a
-                  href="https://github.com"
+                  href="https://github.com/dnishsyzwn"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bracket-btn text-base font-normal text-navy/70 hover:text-navy"

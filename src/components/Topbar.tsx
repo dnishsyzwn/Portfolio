@@ -65,7 +65,7 @@ export default function Topbar() {
           }
         }
 
-        // 3. Calculate darkness in Stack section (#090e15)
+        // 3. Calculate darkness in Stack section (solid #0b1c2e)
         const stack = document.getElementById("stack");
         if (stack) {
           const sRect = stack.getBoundingClientRect();
@@ -85,13 +85,9 @@ export default function Topbar() {
         if (headerRef.current) {
           const t = darkness;
 
-          // Header background: White glass (t=0) to Deep Navy glass #0b1c2e (t=1)
-          const bgAlpha = scrolled ? 0.85 : 0;
-          const bg = lerpColor([255, 255, 255, bgAlpha], [11, 28, 46, bgAlpha], t);
-
-          // Border color: subtle navy to ice-blue
-          const borderAlpha = scrolled ? 0.12 : 0;
-          const border = lerpColor([27, 76, 120, borderAlpha], [200, 225, 245, borderAlpha * 0.9], t);
+          // Header background: Completely invisible (transparent)
+          const bg = "transparent";
+          const border = "transparent";
 
           // Brand gradient stops
           const titleStart = lerpColor([90, 127, 181, 1], [255, 255, 255, 1], t);
@@ -103,8 +99,8 @@ export default function Topbar() {
           // Nav button text & brackets
           const btnText = lerpColor([27, 76, 120, 0.9], [221, 234, 245, 0.95], t);
           const btnBracket = lerpColor([63, 106, 166, 1], [56, 189, 248, 1], t);
-          const btnBg = lerpColor([255, 255, 255, 0.6], [255, 255, 255, 0.07], t);
-          const btnBorder = lerpColor([27, 76, 120, 0.12], [200, 225, 245, 0.14], t);
+          const btnBg = "transparent";
+          const btnBorder = "transparent";
 
           const style = headerRef.current.style;
           style.setProperty("--nav-bg", bg);
@@ -134,15 +130,11 @@ export default function Topbar() {
   return (
     <header
       ref={headerRef}
-      style={{
-        backgroundColor: "var(--nav-bg, rgba(255, 255, 255, 0))",
-        borderColor: "var(--nav-border, rgba(27, 76, 120, 0))",
-      }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-[padding,backdrop-filter] duration-300 backdrop-blur-md border-b ${
-        isScrolled ? "py-3" : "py-5"
+      className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-300 pointer-events-none bg-transparent ${
+        isScrolled ? "py-3.5" : "py-5"
       }`}
     >
-      <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between">
+      <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between pointer-events-auto">
         {/* Name / Brand */}
         <div className="font-sans text-lg md:text-xl tracking-tight font-medium flex items-center">
           <a
@@ -169,7 +161,6 @@ export default function Topbar() {
             { label: "Work", href: "#work" },
             { label: "Curriculum", href: "#curriculum" },
             { label: "Stack", href: "#stack" },
-            { label: "Synthesis", href: "#synthesis", hideOnMobile: true },
           ].map((item) => (
             <a
               key={item.href}
@@ -178,13 +169,11 @@ export default function Topbar() {
                 {
                   "--btn-text": "var(--nav-btn-text, #1b4c78)",
                   "--btn-bracket": "var(--nav-btn-bracket, #3f6aa6)",
-                  "--btn-bg": "var(--nav-btn-bg, rgba(255,255,255,0.6))",
-                  "--btn-border": "var(--nav-btn-border, rgba(27,76,120,0.12))",
+                  "--btn-bg": "transparent",
+                  "--btn-border": "transparent",
                 } as React.CSSProperties
               }
-              className={`bracket-adaptive-btn text-sm ${
-                item.hideOnMobile ? "hidden md:inline-flex" : ""
-              }`}
+              className="bracket-adaptive-btn text-sm"
             >
               {item.label}
             </a>
@@ -196,8 +185,8 @@ export default function Topbar() {
               {
                 "--btn-text": "var(--nav-btn-text, #1b4c78)",
                 "--btn-bracket": "var(--nav-btn-bracket, #3f6aa6)",
-                "--btn-bg": "var(--nav-btn-bg, rgba(255,255,255,0.6))",
-                "--btn-border": "var(--nav-btn-border, rgba(27,76,120,0.12))",
+                "--btn-bg": "transparent",
+                "--btn-border": "transparent",
               } as React.CSSProperties
             }
             className="bracket-adaptive-btn text-sm font-medium"

@@ -133,7 +133,13 @@ export default function WorkSection() {
         {/* ── Card track ─────────────────────────────────────────────── */}
         <div className="flex-1 flex items-center min-h-0">
           <motion.div
-            style={{ x, paddingLeft: `${TRACK_PAD}vw`, gap: `${GAP}vw` } as React.CSSProperties}
+            style={
+              {
+                x,
+                paddingLeft: `${TRACK_PAD}vw`,
+                gap: `${GAP}vw`,
+              } as unknown as React.CSSProperties
+            }
             className="flex will-change-transform"
           >
             {projects.map((proj, idx) => (
