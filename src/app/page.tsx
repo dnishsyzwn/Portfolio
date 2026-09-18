@@ -1,6 +1,7 @@
 import SilkHero from "@/components/SilkHero";
 import WorkSection from "@/components/WorkSection";
-import DevLabGallery from "@/components/DevLabGallery";
+import ServicesSection from "@/components/ServicesSection";
+// import DevLabGallery from "@/components/DevLabGallery"; // Preserved for future use
 import ToolsMarquee from "@/components/ToolsMarquee";
 
 export default function Home() {
@@ -12,8 +13,8 @@ export default function Home() {
       {/* 01 / Work & Featured Case Studies */}
       <WorkSection />
 
-      {/* 02 / Curriculum & Achievements Bento Grid */}
-      <DevLabGallery />
+      {/* 02 / Services & Engineering Capabilities */}
+      <ServicesSection />
 
       {/* 03 / Stack & Tools Infinite Marquee */}
       <ToolsMarquee />

@@ -38,7 +38,7 @@ export default function Topbar() {
         let darkness = 0;
 
         const work = document.getElementById("work");
-        const curriculum = document.getElementById("curriculum");
+        const services = document.getElementById("services") || document.getElementById("curriculum");
 
         // 1. Calculate darkness in Work section during its color inversion scroll
         if (work) {
@@ -57,9 +57,9 @@ export default function Topbar() {
           }
         }
 
-        // 2. Calculate darkness in Curriculum & Achievements section (pure #0b1c2e)
-        if (curriculum) {
-          const cRect = curriculum.getBoundingClientRect();
+        // 2. Calculate darkness in Services section (pure #0b1c2e)
+        if (services) {
+          const cRect = services.getBoundingClientRect();
           if (cRect.top <= 60 && cRect.bottom > 0) {
             darkness = 1;
           }
@@ -159,7 +159,7 @@ export default function Topbar() {
         <nav className="flex items-center gap-2 md:gap-3">
           {[
             { label: "Work", href: "#work" },
-            { label: "Curriculum", href: "#curriculum" },
+            { label: "Services", href: "#services" },
             { label: "Stack", href: "#stack" },
           ].map((item) => (
             <a

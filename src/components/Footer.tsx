@@ -153,10 +153,10 @@ export default function Footer() {
             </div>
             <div>
               <a
-                href="#curriculum"
+                href="#services"
                 className="text-[#1b4c78] hover:text-sky transition-colors"
               >
-                Curriculum &amp; Achievements
+                Services &amp; Architecture
               </a>
             </div>
             <div>
