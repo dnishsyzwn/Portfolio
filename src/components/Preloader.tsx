@@ -4,10 +4,19 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Preloader() {
+  const [shouldShow, setShouldShow] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
 
   useEffect(() => {
+    // Only run the preloader once per session visit
+    const hasSeen = sessionStorage.getItem("portfolio_has_seen_preloader");
+    if (hasSeen) {
+      setIsDone(true);
+      return;
+    }
+
+    setShouldShow(true);
     document.body.style.overflow = "hidden";
 
     const duration = 1400; // 1.4 seconds - snappy, minimalist
@@ -16,7 +25,6 @@ export default function Preloader() {
     const updateCounter = (now: number) => {
       const elapsed = now - startTime;
       const rawProgress = Math.min(1, elapsed / duration);
-      // Subtle easing curve
       const current = Math.floor(rawProgress * 100);
       setProgress(current);
 
@@ -25,6 +33,7 @@ export default function Preloader() {
       } else {
         setTimeout(() => {
           setIsDone(true);
+          sessionStorage.setItem("portfolio_has_seen_preloader", "true");
           document.body.style.overflow = "";
         }, 220);
       }
@@ -37,6 +46,8 @@ export default function Preloader() {
       document.body.style.overflow = "";
     };
   }, []);
+
+  if (!shouldShow) return null;
 
   return (
     <AnimatePresence>

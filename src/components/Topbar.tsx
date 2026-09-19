@@ -138,7 +138,7 @@ export default function Topbar() {
         {/* Name / Brand */}
         <div className="font-sans text-lg md:text-xl tracking-tight font-medium flex items-center">
           <a
-            href="#top"
+            href="/"
             style={{
               backgroundImage:
                 "linear-gradient(to bottom, var(--nav-title-start, #5a7fb5), var(--nav-title-end, #284875))",
@@ -158,9 +158,9 @@ export default function Topbar() {
         {/* Center / Navigation Links with Dynamic Bracket Adaptation */}
         <nav className="flex items-center gap-2 md:gap-3">
           {[
-            { label: "Work", href: "#work" },
-            { label: "Services", href: "#services" },
-            { label: "Stack", href: "#stack" },
+            { label: "Work", href: "/#work" },
+            { label: "Services", href: "/#services" },
+            { label: "Stack", href: "/#stack" },
           ].map((item) => (
             <a
               key={item.href}
@@ -180,7 +180,7 @@ export default function Topbar() {
           ))}
 
           <a
-            href="mailto:contact@danishsyazwan.dev"
+            href="/contact"
             style={
               {
                 "--btn-text": "var(--nav-btn-text, #1b4c78)",

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motion";
-import { Layers3 } from "lucide-react";
+import { Layers3, ArrowUpRight } from "lucide-react";
 import TopographyBackground from "./TopographyBackground";
 
 // ── SVG Visual Centerpieces ──────────────────────────────────────────
@@ -240,13 +240,37 @@ export default function ServicesSection() {
                   3 Core Services • Scroll To Deal
                 </span>
               </motion.div>
+
+              {/* Mobile CTA Button */}
+              <div className="mt-4 lg:hidden">
+                <a
+                  href="/contact"
+                  className="group relative inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#132f4c]/90 hover:bg-[#193c62] border border-[#38bdf8]/40 hover:border-[#38bdf8] text-[#ddeaf5] hover:text-white font-sans text-xs font-medium transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+                >
+                  <span>Need a system built? contact me</span>
+                  <span className="w-4 h-4 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-colors">
+                    <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors" />
+                  </span>
+                </a>
+              </div>
             </div>
 
-            {/* Bottom Descriptor */}
-            <div className="hidden lg:block pt-6 border-t border-[#1e456d]/30">
+            {/* Bottom Descriptor & Desktop CTA Button */}
+            <div className="hidden lg:flex flex-col gap-4 pt-6 border-t border-[#1e456d]/30">
               <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/80 leading-relaxed max-w-[260px]">
                 A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
               </p>
+              <div>
+                <a
+                  href="/contact"
+                  className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#132f4c]/80 hover:bg-[#193c62] border border-[#38bdf8]/40 hover:border-[#38bdf8] text-[#ddeaf5] hover:text-white font-sans text-xs sm:text-[13px] font-medium tracking-wide transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.35),0_0_15px_rgba(56,189,248,0.1)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.25)] hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <span>Need a system built? contact me</span>
+                  <span className="w-5 h-5 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-all duration-300">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors duration-300" />
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
 

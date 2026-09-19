@@ -16,7 +16,7 @@ export default function Footer() {
   let cumulativeCharIdx = 0;
 
   return (
-    <footer className="relative py-20 px-6 md:px-12 border-t border-[#1b4c78]/10 bg-white">
+    <footer id="contact" className="relative py-20 px-6 md:px-12 border-t border-[#1b4c78]/10 bg-white">
       <div className="max-w-[1320px] mx-auto">
         {/* Top Contact Callout */}
         <div ref={containerRef} className="mb-20">
@@ -42,7 +42,7 @@ export default function Footer() {
 
               {/* Main Headline (Strictly 2 lines on desktop/tablet) */}
               <a
-                href="mailto:contact@danishsyazwan.dev"
+                href="/contact"
                 className="font-serif font-bold text-3xl sm:text-5xl md:text-6xl lg:text-[62px] xl:text-[72px] text-[#1b4c78] hover:text-[#2e5189] transition-colors leading-[1.06] tracking-tight block cursor-pointer"
               >
                 {headlineLines.map((lineWords, lineIdx) => (
@@ -112,7 +112,7 @@ export default function Footer() {
               className="shrink-0 lg:mb-3 self-start lg:self-end"
             >
               <a
-                href="mailto:contact@danishsyazwan.dev"
+                href="/contact"
                 className="group relative inline-flex items-center gap-3.5 px-8 py-4 sm:px-9 sm:py-5 rounded-full bg-[#1b4c78] hover:bg-[#0b1c2e] text-white font-sans text-base sm:text-lg font-medium shadow-[0_10px_25px_-5px_rgba(27,76,120,0.35)] hover:shadow-[0_15px_35px_-5px_rgba(11,28,46,0.45)] transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
               >
                 <span>Contact Me</span>

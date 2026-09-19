@@ -6,6 +6,7 @@ import ArchitecturalGrid from "@/components/ArchitecturalGrid";
 import SvgChromeFilters from "@/components/SvgChromeFilters";
 import SmoothScroll from "@/components/SmoothScroll";
 import Preloader from "@/components/Preloader";
+import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   title: "Danish Syazwan — Full-Stack Developer",
@@ -34,7 +35,9 @@ export default function RootLayout({
         {/* Lenis Smooth Inertia Scrolling */}
         <SmoothScroll>
           <Topbar />
-          <main className="relative z-10">{children}</main>
+          <main className="relative z-10">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Footer />
         </SmoothScroll>
       </body>

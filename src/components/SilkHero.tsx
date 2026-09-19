@@ -279,7 +279,7 @@ export default function SilkHero() {
                 className="flex flex-wrap items-center gap-4 text-base md:text-lg font-sans"
               >
                 <a
-                  href="mailto:contact@danishsyazwan.dev"
+                  href="/contact"
                   className="inline-flex items-center gap-2 text-[#1b4c78] font-normal hover:text-[#2e5189] transition-colors group"
                 >
                   <ArrowDownLeft className="w-5 h-5 text-sky transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
