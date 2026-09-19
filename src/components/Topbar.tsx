@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Menu, X } from "lucide-react";
 
 // Linear interpolation helper
 function lerp(a: number, b: number, t: number): number {
@@ -24,6 +25,7 @@ export default function Topbar() {
   const headerRef = useRef<HTMLElement | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [darknessRatio, setDarknessRatio] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let animationFrameId: number;
@@ -116,14 +118,21 @@ export default function Topbar() {
       });
     };
 
+    const onResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+      handleScroll();
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
     handleScroll();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -131,14 +140,15 @@ export default function Topbar() {
     <header
       ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-300 pointer-events-none bg-transparent ${
-        isScrolled ? "py-3.5" : "py-5"
+        isScrolled ? "py-3 sm:py-3.5" : "py-4 sm:py-5"
       }`}
     >
-      <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between pointer-events-auto">
+      <div className="max-w-[1320px] mx-auto px-5 sm:px-6 md:px-12 flex items-center justify-between pointer-events-auto">
         {/* Name / Brand */}
-        <div className="font-sans text-lg md:text-xl tracking-tight font-medium flex items-center">
+        <div className="font-sans text-base sm:text-lg md:text-xl tracking-tight font-medium flex items-center">
           <a
             href="/"
+            onClick={() => setMobileMenuOpen(false)}
             style={{
               backgroundImage:
                 "linear-gradient(to bottom, var(--nav-title-start, #5a7fb5), var(--nav-title-end, #284875))",
@@ -155,8 +165,8 @@ export default function Topbar() {
           </span>
         </div>
 
-        {/* Center / Navigation Links with Dynamic Bracket Adaptation */}
-        <nav className="flex items-center gap-2 md:gap-3">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center gap-2 md:gap-3">
           {[
             { label: "Work", href: "/#work" },
             { label: "Services", href: "/#services" },
@@ -194,7 +204,63 @@ export default function Topbar() {
             Contact
           </a>
         </nav>
+
+        {/* Mobile Hamburger Toggle Button */}
+        <div className="flex md:hidden items-center">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            style={{ color: "var(--nav-btn-text, #1b4c78)" }}
+            className="p-2 -mr-2 rounded-lg hover:bg-black/5 active:scale-95 transition-all focus:outline-none"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Slide-down Navigation Panel */}
+      {mobileMenuOpen && (
+        <div className="md:hidden pointer-events-auto mt-2 mx-4 p-5 rounded-2xl bg-white/95 border border-[#1b4c78]/15 shadow-[0_20px_50px_rgba(27,76,120,0.2)] backdrop-blur-2xl text-[#1b4c78] animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="flex flex-col gap-2.5">
+            {[
+              { label: "Work", href: "/#work" },
+              { label: "Services", href: "/#services" },
+              { label: "Stack", href: "/#stack" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-[#1b4c78]/5 transition-colors font-sans text-base font-medium"
+              >
+                <span>{item.label}</span>
+                <span className="font-mono text-xs text-[#3f6aa6]">[ ↗ ]</span>
+              </a>
+            ))}
+            <a
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-[#1b4c78]/5 hover:bg-[#1b4c78]/10 transition-colors font-sans text-base font-semibold text-[#1b4c78]"
+            >
+              <span>Contact</span>
+              <span className="font-mono text-xs text-[#38bdf8]">[ → ]</span>
+            </a>
+          </div>
+          <div className="mt-4 pt-3 border-t border-[#1b4c78]/10 flex items-center justify-between text-xs font-mono text-[#1b4c78]/60">
+            <span>[ Full-Stack Dev ]</span>
+            <a
+              href="https://github.com/dnishsyzwn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#1b4c78] underline"
+            >
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

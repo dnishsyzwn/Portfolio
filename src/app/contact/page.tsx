@@ -120,7 +120,7 @@ export default function ContactPage() {
       : 1;
 
   return (
-    <div className="relative min-h-screen bg-[#0b1c2e] text-white pt-24 pb-20 px-6 sm:px-10 lg:px-16 selection:bg-[#38bdf8] selection:text-[#0b1c2e]">
+    <div className="relative min-h-screen bg-[#0b1c2e] text-white pt-20 sm:pt-24 pb-16 sm:pb-20 px-4 sm:px-10 lg:px-16 selection:bg-[#38bdf8] selection:text-[#0b1c2e]">
       {/* Anchor for Topbar to apply dark theme nav styles */}
       <div id="services" className="fixed inset-0 pointer-events-none -z-50" aria-hidden="true" />
 
@@ -319,10 +319,10 @@ export default function ContactPage() {
             className="pt-12 sm:pt-16 mt-auto"
           >
             <h1 className="font-serif font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[52px] text-white tracking-tight uppercase leading-[1.08] mb-2.5">
-              SEND US A MESSAGE
+              SEND ME A MESSAGE
             </h1>
             <p className="font-sans text-xs sm:text-sm text-slate-300 tracking-wide uppercase font-normal">
-              FEEL FREE TO WRITE US AND ASK ANY QUESTION YOU HAVE.
+              FEEL FREE TO WRITE ME AND ASK ANY QUESTION YOU HAVE.
             </p>
           </motion.div>
 
@@ -331,7 +331,7 @@ export default function ContactPage() {
         {/* ── RIGHT SECTION: PURE VIDEOS WITH INTERACTIVE HOVER ACCORDION ── */}
         <div
           onMouseLeave={() => setHoveredImage(null)}
-          className="lg:col-span-6 flex flex-row gap-3 sm:gap-4 h-[480px] sm:h-[560px] md:h-[620px] lg:h-[660px] xl:h-[700px] w-full"
+          className="lg:col-span-6 flex flex-row gap-3 sm:gap-4 h-[300px] sm:h-[420px] md:h-[540px] lg:h-[660px] xl:h-[700px] w-full mt-6 lg:mt-0"
         >
           {/* Video 1: Tall Vertical Video (Col 1) */}
           <motion.div

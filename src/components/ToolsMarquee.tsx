@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { TextLineReveal } from "./MotionReveal";
 
@@ -262,14 +262,22 @@ export const columns: TechItem[][] = [
 
 export default function ToolsMarquee() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Scroll tracking across the section for subtle parallax offsets
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Scroll tracking across the section for subtle parallax offsets on desktop
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  // ── Subtle Parallax Offsets on Scroll ────────────────────────────────────
+  // ── Subtle Parallax Offsets on Scroll (Desktop only) ──────────────────────
   // Row/Column 1: Moves UP as user scrolls down
   const col1Y = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
@@ -288,7 +296,7 @@ export default function ToolsMarquee() {
     <section
       ref={sectionRef}
       id="stack"
-      className="relative py-28 md:py-36 px-6 md:px-12 bg-[#0b1c2e] text-[#ddeaf5] border-t border-[#1e456d]/40 overflow-hidden"
+      className="relative py-16 sm:py-24 md:py-36 px-4 sm:px-8 md:px-12 bg-[#0b1c2e] text-[#ddeaf5] border-t border-[#1e456d]/40 overflow-hidden"
     >
       {/* Background ambient lighting */}
       <div
@@ -298,38 +306,38 @@ export default function ToolsMarquee() {
 
       <div className="max-w-[1360px] mx-auto relative z-10">
         {/* Section Header */}
-        <header className="mb-16 md:mb-20">
+        <header className="mb-10 sm:mb-16 md:mb-20">
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6fa3d4] mb-3 block">
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6fa3d4] mb-2.5 block">
               03 / TECHNICAL ARSENAL
             </span>
             <TextLineReveal>
-              <h2 className="font-serif font-bold text-4xl sm:text-5xl md:text-6xl text-[#ddeaf5] tracking-tight leading-none">
+              <h2 className="font-serif font-bold text-3xl sm:text-5xl md:text-6xl text-[#ddeaf5] tracking-tight leading-none">
                 Tools &amp; Stack I Use
               </h2>
             </TextLineReveal>
           </div>
         </header>
 
-        {/* ── 4-Column Pinterest Masonry Grid ─────────────────────────────── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 items-start">
+        {/* ── 4-Column Pinterest Masonry Grid (2 columns on mobile, 4 on desktop) ── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 items-start">
           {columns.map((colItems, colIdx) => (
             <motion.div
               key={colIdx}
-              style={{ y: colTransforms[colIdx] }}
-              className={`flex flex-col gap-4 md:gap-6 will-change-transform ${
+              style={{ y: isMobile ? 0 : colTransforms[colIdx] }}
+              className={`flex flex-col gap-3 sm:gap-4 md:gap-6 will-change-transform ${
                 colIdx === 1 ? "md:pt-10" : colIdx === 3 ? "md:pt-14" : ""
               }`}
             >
               {colItems.map((item, itemIdx) => (
                 <div
                   key={itemIdx}
-                  className="group relative w-full rounded-2xl md:rounded-3xl p-4 sm:p-5 bg-[#0e2238]/85 border border-[#1e456d]/50 hover:border-[#38bdf8]/60 hover:shadow-[0_12px_35px_-8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-y-2 cursor-pointer select-none flex flex-col justify-between"
+                  className="group relative w-full rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-5 bg-[#0e2238]/85 border border-[#1e456d]/50 hover:border-[#38bdf8]/60 hover:shadow-[0_12px_35px_-8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out md:hover:-translate-y-2 cursor-pointer select-none flex flex-col justify-between"
                 >
                   {/* Pinterest Top: Visual Logo Showcase (Single or paired images) */}
-                  <div className="relative w-full aspect-[4/3] rounded-xl md:rounded-2xl bg-[#081320]/80 border border-[#1b3d60]/60 flex items-center justify-center gap-3 sm:gap-4 md:gap-5 p-4 sm:p-5 overflow-hidden transition-all duration-300 group-hover:border-[#38bdf8]/40">
+                  <div className="relative w-full aspect-[4/3] rounded-xl md:rounded-2xl bg-[#081320]/80 border border-[#1b3d60]/60 flex items-center justify-center gap-2 sm:gap-4 md:gap-5 p-3 sm:p-4 md:p-5 overflow-hidden transition-all duration-300 group-hover:border-[#38bdf8]/40">
                     {item.logos.map((logo, lIdx) => (
-                      <div key={lIdx} className="flex items-center gap-3 sm:gap-4 md:gap-5">
+                      <div key={lIdx} className="flex items-center gap-2 sm:gap-4 md:gap-5">
                         {lIdx > 0 && (
                           <span className="text-[#38bdf8]/35 font-mono text-xs sm:text-sm font-light select-none">
                             +
@@ -341,8 +349,8 @@ export default function ToolsMarquee() {
                           loading="lazy"
                           className={`object-contain drop-shadow-md transition-transform duration-300 ease-out group-hover:scale-110 ${
                             item.logos.length > 1
-                              ? "w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12"
-                              : "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
+                              ? "w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12"
+                              : "w-10 h-10 sm:w-13 sm:h-13 md:w-16 md:h-16"
                           } ${logo.invert ? "brightness-0 invert" : ""}`}
                         />
                       </div>
@@ -350,18 +358,18 @@ export default function ToolsMarquee() {
                   </div>
 
                   {/* Pinterest Bottom: Info & Tag Metadata */}
-                  <div className="mt-4 flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-sans font-semibold text-base sm:text-lg text-[#ddeaf5] tracking-tight leading-snug">
+                  <div className="mt-3 sm:mt-4 flex flex-col gap-1 sm:gap-1.5">
+                    <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+                      <h3 className="font-sans font-semibold text-sm sm:text-base md:text-lg text-[#ddeaf5] tracking-tight leading-snug truncate">
                         {item.name}
                       </h3>
 
-                      <span className="font-mono text-[10px] sm:text-[11px] font-semibold px-2 sm:px-2.5 py-0.5 rounded-full bg-[#0b1c2e] text-[#38bdf8] border border-[#38bdf8]/30 tracking-wide whitespace-nowrap">
+                      <span className="font-mono text-[9px] sm:text-[10px] md:text-[11px] font-semibold px-1.5 sm:px-2.5 py-0.5 rounded-full bg-[#0b1c2e] text-[#38bdf8] border border-[#38bdf8]/30 tracking-wide whitespace-nowrap shrink-0">
                         {item.tag}
                       </span>
                     </div>
 
-                    <p className="font-sans text-xs sm:text-[13px] text-[#8bb1d3] leading-tight line-clamp-1">
+                    <p className="font-sans text-[11px] sm:text-xs md:text-[13px] text-[#8bb1d3] leading-tight line-clamp-1">
                       {item.category}
                     </p>
                   </div>

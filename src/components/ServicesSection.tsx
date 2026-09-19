@@ -194,22 +194,94 @@ export default function ServicesSection() {
   const progressWidth = useTransform(scrollYProgress, [0.05, 0.85], ["0%", "100%"]);
 
   return (
-    <div
-      ref={containerRef}
+    <section
       id="services"
       className="relative bg-[#0b1c2e]"
-      style={{ height: `${RUNWAY_VH}vh` }}
     >
       {/* Anchor alias so previous #curriculum or #services both scroll here */}
       <div id="curriculum" className="absolute top-0 left-0" aria-hidden="true" />
 
-      {/* ── Sticky Viewport ─────────────────────────────────────────── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between bg-[#0b1c2e] text-[#ddeaf5] border-t border-[#1e456d]/40">
-        
-        {/* Subtle Topography Contour Background */}
-        <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-screen scale-110">
-          <TopographyBackground />
+      {/* ── Mobile Layout (Clean Vertical Flow) ── */}
+      <div className="block md:hidden relative px-5 sm:px-8 py-16 text-[#ddeaf5] border-t border-[#1e456d]/40">
+        {/* Mobile Section Header */}
+        <div className="mb-10">
+          <span className="font-mono font-bold text-xs text-[#38bdf8] tracking-[0.14em] uppercase block mb-2.5">
+            MY SERVICES &amp; CAPABILITIES
+          </span>
+          <h2 className="font-serif font-bold text-3xl sm:text-4xl text-[#ddeaf5] tracking-tight leading-[1.1] mb-4">
+            From system architecture to production
+          </h2>
+          <p className="font-sans text-xs sm:text-sm text-[#9dbfd9]/80 leading-relaxed mb-6">
+            A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
+          </p>
+          <a
+            href="/contact"
+            className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#132f4c]/90 hover:bg-[#193c62] border border-[#38bdf8]/40 text-[#ddeaf5] font-sans text-xs font-medium transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+          >
+            <span>Need a system built? Contact me</span>
+            <span className="w-4 h-4 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-colors">
+              <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors" />
+            </span>
+          </a>
         </div>
+
+        {/* Mobile Cards Stack */}
+        <div className="flex flex-col gap-6">
+          {serviceCards.map((service, sIdx) => (
+            <div
+              key={sIdx}
+              className="rounded-2xl bg-gradient-to-b from-[#132f4e]/95 via-[#0e243a]/95 to-[#091a2b] border border-[#1e456d]/75 p-6 flex flex-col justify-between shadow-[0_12px_36px_rgba(0,0,0,0.5)]"
+            >
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#163a5f]/60 border border-[#38bdf8]/30">
+                  <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-wider">SERVICE</span>
+                  <span className="font-mono text-xs font-bold text-[#38bdf8]">/{service.number}</span>
+                </div>
+                <span className="font-mono text-[10px] text-[#9dbfd9]/70 uppercase tracking-widest font-medium">
+                  {service.tag}
+                </span>
+              </div>
+
+              <div className="py-3 flex items-center justify-center">
+                {service.graphic}
+              </div>
+
+              <div className="mt-4">
+                <h3 className="font-sans font-bold text-lg text-[#ddeaf5] tracking-tight leading-snug mb-2">
+                  {service.title}
+                </h3>
+                <p className="font-sans text-xs text-[#9dbfd9]/85 leading-relaxed">
+                  {service.description}
+                </p>
+                <div className="mt-4 pt-3 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
+                  {service.capabilities.map((item) => (
+                    <span
+                      key={item}
+                      className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Desktop Layout (Sticky Viewport & 3-Card Deck Dealing) ── */}
+      <div
+        ref={containerRef}
+        className="hidden md:block relative"
+        style={{ height: `${RUNWAY_VH}vh` }}
+      >
+        {/* ── Sticky Viewport ─────────────────────────────────────────── */}
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between bg-[#0b1c2e] text-[#ddeaf5] border-t border-[#1e456d]/40">
+          
+          {/* Subtle Topography Contour Background */}
+          <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-screen scale-110">
+            <TopographyBackground />
+          </div>
 
         {/* ── STAGE CONTAINER: Left Editorial Column + Right 3-Card Stage ─── */}
         <div className="relative z-10 flex-1 max-w-[1560px] mx-auto w-full px-6 md:px-10 lg:px-12 pt-[68px] pb-3 flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-12 items-center justify-between min-h-0">
@@ -440,5 +512,6 @@ export default function ServicesSection() {
         </footer>
       </div>
     </div>
+    </section>
   );
 }

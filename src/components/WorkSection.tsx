@@ -325,63 +325,132 @@ export default function WorkSection() {
   const clipPath = useMotionTemplate`circle(${bubbleR}vmax at ${bubbleX}% ${bubbleY}%)`;
 
   return (
-    <div
-      ref={containerRef}
-      id="work"
-      className="relative"
-      style={{ height: `${RUNWAY_VH}vh` }}
-    >
-      {/* ── Sticky viewport ─────────────────────────────────────────── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden will-change-transform">
-        {/* Base Layer: White background with deep navy text */}
-        <div className="absolute inset-0">
-          <WorkContent
-            theme="light"
-            trackRef={trackRef}
-            x={x}
-            trackOp={trackOp}
-            trackY={trackY}
-            progressWidth={progressWidth}
-            headerY={headerY}
-            headerOp={headerOp}
-            hoveredIdx={hoveredIdx}
-            setHoveredIdx={setHoveredIdx}
-          />
+    <section id="work" className="relative">
+      {/* ── Mobile Layout (Natural Vertical Scroll) ── */}
+      <div className="block md:hidden bg-white text-[#102d4a] py-14 border-t border-[#1b4c78]/10">
+        {/* Mobile Header */}
+        <div className="px-6 sm:px-8 pb-6 border-b border-[#1b4c78]/10 flex items-end justify-between">
+          <div>
+            <h2 className="font-serif font-bold text-3xl sm:text-4xl text-[#102d4a] tracking-tight leading-none">
+              Work
+            </h2>
+            <p className="font-sans text-xs sm:text-sm text-[#1b4c78]/70 mt-1.5">
+              Selected projects &amp; systems architecture.
+            </p>
+          </div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[#1b4c78]/50 pb-0.5">
+            01 / Selected
+          </span>
         </div>
 
-        {/* Clipped Top Layer: Solid blue (#0b1c2e) bubble with light text */}
-        <motion.div
-          aria-hidden="true"
-          style={{ clipPath }}
-          className="absolute inset-0 pointer-events-none will-change-transform"
-        >
-          <WorkContent
-            theme="dark"
-            x={x}
-            trackOp={trackOp}
-            trackY={trackY}
-            progressWidth={progressWidth}
-            headerY={headerY}
-            headerOp={headerOp}
-            hoveredIdx={hoveredIdx}
-          />
-        </motion.div>
+        {/* Mobile Project Cards List */}
+        <div className="px-5 sm:px-8 pt-8 flex flex-col gap-8">
+          {projects.map((proj, idx) => (
+            <article
+              key={idx}
+              className="flex flex-col rounded-2xl overflow-hidden border border-[#1b4c78]/15 bg-white shadow-[0_10px_30px_-5px_rgba(27,76,120,0.1)]"
+            >
+              {/* Project Screenshot / Visual */}
+              <div
+                className="w-full aspect-[16/10] relative overflow-hidden bg-[#111215] border-b border-[#1b4c78]/10"
+                style={{ backgroundColor: proj.bg || "#111215" }}
+              >
+                {proj.image ? (
+                  <img
+                    src={proj.image}
+                    alt={proj.title}
+                    loading={idx < 2 ? "eager" : "lazy"}
+                    className="w-full h-full object-cover object-left-top"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      background: proj.visual,
+                      backgroundImage: [proj.overlay, proj.visual].join(", "),
+                      backgroundSize: "cover, cover",
+                      backgroundPosition: "center, center",
+                    }}
+                  />
+                )}
+                {/* Index Pill */}
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/65 backdrop-blur-md border border-white/20 font-mono text-[10px] font-semibold text-white tracking-wider">
+                  0{idx + 1}
+                </div>
+              </div>
 
-        {/* Subtle luminous bubble perimeter highlight while sliding */}
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute rounded-full border border-sky-400/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]"
-          style={{
-            left: useMotionTemplate`${bubbleX}%`,
-            top: useMotionTemplate`${bubbleY}%`,
-            width: useMotionTemplate`${bubbleDiam}vmax`,
-            height: useMotionTemplate`${bubbleDiam}vmax`,
-            x: "-50%",
-            y: "-50%",
-            opacity: bubbleBorderOp,
-          }}
-        />
+              {/* Title & Description */}
+              <div className="p-5 sm:p-6 flex flex-col gap-2">
+                <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#102d4a] tracking-tight leading-snug">
+                  {proj.title}
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-[#1e3d5f]/85 leading-relaxed">
+                  {proj.description}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* ── Desktop Layout (Cinematic Pinned Horizontal Runway) ── */}
+      <div
+        ref={containerRef}
+        className="hidden md:block relative"
+        style={{ height: `${RUNWAY_VH}vh` }}
+      >
+        {/* ── Sticky viewport ─────────────────────────────────────────── */}
+        <div className="sticky top-0 h-screen w-full overflow-hidden will-change-transform">
+          {/* Base Layer: White background with deep navy text */}
+          <div className="absolute inset-0">
+            <WorkContent
+              theme="light"
+              trackRef={trackRef}
+              x={x}
+              trackOp={trackOp}
+              trackY={trackY}
+              progressWidth={progressWidth}
+              headerY={headerY}
+              headerOp={headerOp}
+              hoveredIdx={hoveredIdx}
+              setHoveredIdx={setHoveredIdx}
+            />
+          </div>
+
+          {/* Clipped Top Layer: Solid blue (#0b1c2e) bubble with light text */}
+          <motion.div
+            aria-hidden="true"
+            style={{ clipPath }}
+            className="absolute inset-0 pointer-events-none will-change-transform"
+          >
+            <WorkContent
+              theme="dark"
+              x={x}
+              trackOp={trackOp}
+              trackY={trackY}
+              progressWidth={progressWidth}
+              headerY={headerY}
+              headerOp={headerOp}
+              hoveredIdx={hoveredIdx}
+            />
+          </motion.div>
+
+          {/* Subtle luminous bubble perimeter highlight while sliding */}
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute rounded-full border border-sky-400/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]"
+            style={{
+              left: useMotionTemplate`${bubbleX}%`,
+              top: useMotionTemplate`${bubbleY}%`,
+              width: useMotionTemplate`${bubbleDiam}vmax`,
+              height: useMotionTemplate`${bubbleDiam}vmax`,
+              x: "-50%",
+              y: "-50%",
+              opacity: bubbleBorderOp,
+            }}
+          />
+        </div>
+      </div>
+    </section>
   );
 }

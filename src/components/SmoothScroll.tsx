@@ -7,13 +7,16 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Highly-tuned Lenis smooth inertia configuration for 60-120fps fluid scrolling
+    // Enable native iOS/Android momentum scrolling on mobile devices under 768px
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return;
+    }
+
+    // Highly-tuned Lenis smooth inertia configuration for 60-120fps fluid scrolling on desktop
     const lenis = new Lenis({
       lerp: 0.09, // Instant, buttery-smooth linear interpolation without heavy input lag
       wheelMultiplier: 0.9, // Balanced scroll distance per wheel click
-      touchMultiplier: 1.5,
       smoothWheel: true,
-      syncTouch: false,
     });
 
     lenisRef.current = lenis;

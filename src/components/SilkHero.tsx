@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDownLeft, ChevronDown } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import TopographyBackground from "./TopographyBackground";
@@ -8,6 +8,7 @@ import TopographyBackground from "./TopographyBackground";
 export default function SilkHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Scroll runway: 240vh total scroll distance
   // start start: hero starts full screen
@@ -60,7 +61,9 @@ export default function SilkHero() {
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      setIsMobile(window.innerWidth < 768);
     };
+    handleResize();
 
     let isVisible = true;
     const observer = new IntersectionObserver(
@@ -86,12 +89,21 @@ export default function SilkHero() {
 
       ctx.clearRect(0, 0, width, height);
 
+      const isMob = width < 768;
+
       // Radiant background
       const baseGrad = ctx.createLinearGradient(0, 0, width, height);
-      baseGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
-      baseGrad.addColorStop(0.3, "rgba(240, 248, 255, 0.9)");
-      baseGrad.addColorStop(0.65, "rgba(200, 228, 248, 0.75)");
-      baseGrad.addColorStop(1, "rgba(164, 207, 240, 0.85)");
+      if (isMob) {
+        baseGrad.addColorStop(0, "rgba(240, 248, 255, 0.95)");
+        baseGrad.addColorStop(0.3, "rgba(224, 242, 254, 0.9)");
+        baseGrad.addColorStop(0.65, "rgba(190, 224, 248, 0.8)");
+        baseGrad.addColorStop(1, "rgba(164, 207, 240, 0.85)");
+      } else {
+        baseGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
+        baseGrad.addColorStop(0.3, "rgba(240, 248, 255, 0.9)");
+        baseGrad.addColorStop(0.65, "rgba(200, 228, 248, 0.75)");
+        baseGrad.addColorStop(1, "rgba(164, 207, 240, 0.85)");
+      }
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, width, height);
 
@@ -101,33 +113,33 @@ export default function SilkHero() {
           color1: "rgba(200, 228, 248, 0.55)",
           color2: "rgba(124, 184, 232, 0.45)",
           speed: 1.0,
-          amp: 120,
-          freq: 0.0018,
-          xOffset: width * 0.35,
+          amp: isMob ? 65 : 120,
+          freq: isMob ? 0.0025 : 0.0018,
+          xOffset: isMob ? width * 0.15 : width * 0.35,
         },
         {
           color1: "rgba(164, 207, 240, 0.45)",
           color2: "rgba(237, 246, 255, 0.65)",
           speed: 0.8,
-          amp: 160,
-          freq: 0.0014,
-          xOffset: width * 0.55,
+          amp: isMob ? 80 : 160,
+          freq: isMob ? 0.002 : 0.0014,
+          xOffset: isMob ? width * 0.35 : width * 0.55,
         },
         {
           color1: "rgba(124, 184, 232, 0.35)",
           color2: "rgba(200, 228, 248, 0.4)",
           speed: 1.2,
-          amp: 140,
-          freq: 0.002,
-          xOffset: width * 0.72,
+          amp: isMob ? 70 : 140,
+          freq: isMob ? 0.0028 : 0.002,
+          xOffset: isMob ? width * 0.55 : width * 0.72,
         },
         {
           color1: "rgba(245, 250, 255, 0.6)",
           color2: "rgba(164, 207, 240, 0.3)",
           speed: 0.7,
-          amp: 190,
-          freq: 0.0012,
-          xOffset: width * 0.85,
+          amp: isMob ? 90 : 190,
+          freq: isMob ? 0.0018 : 0.0012,
+          xOffset: isMob ? width * 0.75 : width * 0.85,
         },
       ];
 
@@ -166,14 +178,14 @@ export default function SilkHero() {
 
       // Ambient radial bloom behind headline
       const glow = ctx.createRadialGradient(
-        width * 0.4,
-        height * 0.45,
-        50,
-        width * 0.4,
-        height * 0.45,
-        width * 0.6
+        width * (isMob ? 0.5 : 0.4),
+        height * (isMob ? 0.42 : 0.45),
+        isMob ? 20 : 50,
+        width * (isMob ? 0.5 : 0.4),
+        height * (isMob ? 0.42 : 0.45),
+        width * (isMob ? 0.85 : 0.6)
       );
-      glow.addColorStop(0, "rgba(255, 255, 255, 0.85)");
+      glow.addColorStop(0, isMob ? "rgba(255, 255, 255, 0.55)" : "rgba(255, 255, 255, 0.85)");
       glow.addColorStop(0.5, "rgba(237, 246, 255, 0.3)");
       glow.addColorStop(1, "rgba(255, 255, 255, 0)");
       ctx.fillStyle = glow;
@@ -193,27 +205,44 @@ export default function SilkHero() {
   }, []);
 
   return (
-    // 240vh Scroll runway: User scrolls through this distance to trigger the hero zoom-out into the white grid
-    <div ref={containerRef} id="top" className="relative h-[240vh] bg-white">
-      {/* Pinned Sticky Viewport */}
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden bg-white">
-        {/* Topographic contour background — reveals as hero zooms out */}
+    // 240vh Scroll runway on desktop; natural viewport flow on mobile
+    <div
+      ref={containerRef}
+      id="top"
+      className={`relative ${isMobile ? "min-h-[100svh]" : "h-[240vh]"} w-full bg-white`}
+    >
+      {/* Pinned Sticky Viewport on Desktop / Full-height container on Mobile */}
+      <div
+        className={`${
+          isMobile ? "relative min-h-[100svh] w-full" : "sticky top-0 h-screen w-full"
+        } flex items-center justify-center overflow-hidden bg-white`}
+      >
+        {/* Topographic contour background — reveals as hero zooms out on desktop */}
+        {!isMobile && (
+          <motion.div
+            style={{ opacity: topoOpacity, scale: topoScale }}
+            className="absolute inset-0 w-full h-full pointer-events-none z-0 will-change-transform"
+          >
+            <TopographyBackground scrollYProgress={scrollYProgress} />
+          </motion.div>
+        )}
+
+        {/* The Entire Hero Section Capsule that zooms out on scroll on desktop */}
         <motion.div
-          style={{ opacity: topoOpacity, scale: topoScale }}
-          className="absolute inset-0 w-full h-full pointer-events-none z-0 will-change-transform"
-        >
-          <TopographyBackground scrollYProgress={scrollYProgress} />
-        </motion.div>
-        {/* The Entire Hero Section Capsule that zooms out on scroll */}
-        <motion.div
-          style={{
-            scale: heroScale,
-            borderRadius: heroRadius,
-            border: heroBorder,
-            boxShadow: heroShadow,
-            opacity: heroOpacity,
-          }}
-          className="relative w-full h-full max-w-[100vw] max-h-[100vh] flex items-center justify-center overflow-hidden bg-white origin-center will-change-transform"
+          style={
+            isMobile
+              ? { scale: 1, opacity: 1 }
+              : {
+                  scale: heroScale,
+                  borderRadius: heroRadius,
+                  border: heroBorder,
+                  boxShadow: heroShadow,
+                  opacity: heroOpacity,
+                }
+          }
+          className={`relative w-full ${
+            isMobile ? "min-h-[100svh] bg-[#edf6ff]" : "h-full max-w-[100vw] max-h-[100vh] bg-white"
+          } flex items-center justify-center overflow-hidden origin-center will-change-transform`}
         >
           {/* Silk Canvas Simulation background */}
           <canvas
@@ -223,22 +252,26 @@ export default function SilkHero() {
           />
 
           {/* Subtle bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+          <div
+            className={`absolute inset-x-0 bottom-0 ${
+              isMobile ? "h-14" : "h-36"
+            } bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10`}
+          />
 
           {/* Content Container */}
           <motion.div
-            style={{ scale: textScale }}
-            className="relative z-20 max-w-[1320px] mx-auto px-6 md:px-12 w-full pt-16 pb-12"
+            style={isMobile ? { scale: 1 } : { scale: textScale }}
+            className="relative z-20 max-w-[1320px] mx-auto px-5 sm:px-8 md:px-12 w-full pt-24 md:pt-16 pb-16 md:pb-12"
           >
             <div className="max-w-6xl">
               {/* Main Editorial Headline with Chrome Specular Light Effect & Staggered Rise */}
-              <h1 className="font-serif font-bold tracking-[-0.035em] text-[#1f4a74] text-4xl sm:text-6xl md:text-7xl lg:text-[74px] xl:text-[82px] leading-[1.06] mb-8 select-none">
+              <h1 className="font-serif font-bold tracking-[-0.035em] text-[#1f4a74] text-3xl sm:text-5xl md:text-7xl lg:text-[74px] xl:text-[82px] leading-[1.08] mb-6 sm:mb-8 select-none">
                 <div className="overflow-hidden py-1">
                   <motion.span
                     initial={{ y: "115%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    className="glass-line block"
+                    className="glass-line block max-w-full"
                     data-text="Systems with soul."
                   >
                     Systems with soul.
@@ -249,7 +282,7 @@ export default function SilkHero() {
                     initial={{ y: "115%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="glass-line block"
+                    className="glass-line block max-w-full"
                     data-text="I write code that breathes."
                   >
                     I write code that breathes.
@@ -262,7 +295,7 @@ export default function SilkHero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="max-w-xl text-[#1b4c78] font-sans text-base sm:text-lg md:text-xl leading-relaxed tracking-[-0.015em] mb-10 opacity-90"
+                className="max-w-xl text-[#1b4c78] font-sans text-sm sm:text-lg md:text-xl leading-relaxed tracking-[-0.015em] mb-8 sm:mb-10 opacity-90"
               >
                 <p>
                   Hello, I&apos;m <span className="font-medium text-[#1b4c78]">Danish Syazwan</span>. I&apos;m a full-stack
@@ -276,7 +309,7 @@ export default function SilkHero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-wrap items-center gap-4 text-base md:text-lg font-sans"
+                className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base md:text-lg font-sans"
               >
                 <a
                   href="/contact"
@@ -304,10 +337,10 @@ export default function SilkHero() {
 
           {/* Minimalist scroll prompt pill */}
           <motion.div
-            style={{ opacity: scrollIndicatorOpacity }}
-            className="absolute bottom-8 right-8 z-30 font-mono text-[11px] text-[#1b4c78]/60 flex items-center gap-2 bg-white/70 backdrop-blur-sm px-3 py-1.5 border border-[#1b4c78]/15 rounded-full"
+            style={isMobile ? { opacity: 1 } : { opacity: scrollIndicatorOpacity }}
+            className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 z-30 font-mono text-[10px] sm:text-[11px] text-[#1b4c78]/60 flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm px-3 py-1.5 border border-[#1b4c78]/15 rounded-full"
           >
-            <span>SCROLL TO ZOOM</span>
+            <span>{isMobile ? "SCROLL DOWN" : "SCROLL TO ZOOM"}</span>
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
           </motion.div>
         </motion.div>
