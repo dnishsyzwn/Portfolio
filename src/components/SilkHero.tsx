@@ -288,6 +288,7 @@ export default function SilkHero() {
                     I write code that breathes.
                   </motion.span>
                 </div>
+                <span className="sr-only"> — Danish Syazwan | Full-Stack Software Engineer & Distributed Systems Developer</span>
               </h1>
 
               {/* Intro Description */}

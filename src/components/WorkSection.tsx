@@ -178,7 +178,7 @@ function WorkContent({
                   {proj.image ? (
                     <img
                       src={proj.image}
-                      alt={proj.title}
+                      alt={`${proj.title} — ${proj.description}`}
                       loading={idx < 2 ? "eager" : "lazy"}
                       className={`w-full h-full object-cover object-left-top transition-transform duration-700 ease-out ${
                         isHovered ? "scale-[1.02]" : "scale-100"

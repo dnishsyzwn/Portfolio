@@ -8,11 +8,113 @@ import SmoothScroll from "@/components/SmoothScroll";
 import Preloader from "@/components/Preloader";
 import PageTransition from "@/components/PageTransition";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danishsyazwan.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Danish Syazwan — Full-Stack Developer",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Danish Syazwan — Full-Stack Developer",
+    template: "%s | Danish Syazwan",
+  },
   description:
     "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
-  keywords: ["Danish Syazwan", "Full-Stack Developer", "Next.js", "TypeScript", "React", "Distributed Systems"],
+  keywords: [
+    "Danish Syazwan",
+    "Full-Stack Developer",
+    "Software Engineer",
+    "Next.js",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Distributed Systems",
+    "Frontend Engineer",
+    "Backend Developer",
+    "Web Development",
+  ],
+  authors: [{ name: "Danish Syazwan", url: "https://github.com/dnishsyzwn" }],
+  creator: "Danish Syazwan",
+  publisher: "Danish Syazwan",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    title: "Danish Syazwan — Full-Stack Developer",
+    description:
+      "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
+    siteName: "Danish Syazwan Portfolio",
+    images: [
+      {
+        url: "/syncuid.png",
+        width: 1200,
+        height: 630,
+        alt: "Danish Syazwan — Full-Stack Developer Portfolio",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Danish Syazwan — Full-Stack Developer",
+    description:
+      "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
+    images: ["/syncuid.png"],
+    creator: "@dnishsyzwn",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": `${siteUrl}/#person`,
+      name: "Danish Syazwan",
+      jobTitle: "Full-Stack Developer",
+      url: siteUrl,
+      sameAs: [
+        "https://github.com/dnishsyzwn",
+        "https://www.linkedin.com/in/danish-syazwan-109725339/",
+      ],
+      knowsAbout: [
+        "Full-Stack Development",
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Distributed Systems",
+        "Interactive UI Design",
+        "Node.js",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      url: siteUrl,
+      name: "Danish Syazwan Portfolio",
+      description:
+        "Portfolio of Danish Syazwan, full-stack software engineer crafting distributed web systems and interactive experiences.",
+      publisher: {
+        "@id": `${siteUrl}/#person`,
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -22,6 +124,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="lenis lenis-smooth">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="relative bg-white text-navy font-sans selection:bg-[#c8e4f8] selection:text-[#1b4c78]">
         {/* Preloader Entrance Sequence (Inspired by landonorris.com) */}
         <Preloader />
