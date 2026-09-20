@@ -23,23 +23,6 @@ export default function Footer() {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 lg:gap-12">
             {/* Left: Animated Eyebrow & Wave Headline (2 lines max) */}
             <div className="max-w-4xl lg:max-w-5xl flex-1">
-              {/* Eyebrow with blur-to-clear fade-in */}
-              <motion.span
-                initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-                animate={
-                  isInView
-                    ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                    : { opacity: 0, y: 16, filter: "blur(8px)" }
-                }
-                transition={{
-                  duration: 0.65,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="font-mono text-xs uppercase tracking-widest text-[#3f6aa6] font-medium block mb-4"
-              >
-                HAVE A SYSTEM TO BUILD?
-              </motion.span>
-
               {/* Main Headline (Strictly 2 lines on desktop/tablet) */}
               <a
                 href="/contact"

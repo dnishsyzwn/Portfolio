@@ -308,9 +308,6 @@ export default function ToolsMarquee() {
         {/* Section Header */}
         <header className="mb-10 sm:mb-16 md:mb-20">
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6fa3d4] mb-2.5 block">
-              03 / TECHNICAL ARSENAL
-            </span>
             <TextLineReveal>
               <h2 className="font-serif font-bold text-3xl sm:text-5xl md:text-6xl text-[#ddeaf5] tracking-tight leading-none">
                 Tools &amp; Stack I Use

@@ -28,7 +28,7 @@ const HALFTONE_DOTS = (() => {
 
 function HalftoneGraphic() {
   return (
-    <svg viewBox="0 0 224 224" className="w-full h-44 sm:h-52 lg:h-60 overflow-visible">
+    <svg viewBox="0 0 224 224" className="w-full h-28 sm:h-32 lg:h-36 xl:h-40 max-h-[160px] overflow-visible">
       <defs>
         <radialGradient id="halftoneGlow" cx="20%" cy="50%" r="55%">
           <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.25" />
@@ -52,7 +52,7 @@ function HalftoneGraphic() {
 
 function TelemetryGraphic() {
   return (
-    <svg viewBox="0 0 224 224" className="w-full h-44 sm:h-52 lg:h-60 overflow-visible">
+    <svg viewBox="0 0 224 224" className="w-full h-28 sm:h-32 lg:h-36 xl:h-40 max-h-[160px] overflow-visible">
       <defs>
         <linearGradient id="telemetryGrad" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.95" />
@@ -74,15 +74,15 @@ function TelemetryGraphic() {
       <circle cx="186" cy="86" r="4.5" fill="#38bdf8" />
       <circle cx="186" cy="86" r="10" fill="none" stroke="#38bdf8" strokeWidth="1.2" opacity="0.5" />
       {/* Telemetry data labels */}
-      <text x="24" y="184" fill="#6fa3d4" fontSize="9" fontFamily="monospace" opacity="0.8">FLOW // ACTIVE</text>
-      <text x="124" y="48" fill="#38bdf8" fontSize="9" fontFamily="monospace" opacity="0.9">RELAY_COORDINATE</text>
+      <text x="24" y="184" fill="#6fa3d4" fontSize="9" fontFamily="sans-serif" letterSpacing="0.8" opacity="0.85">TELEMETRY RELAY</text>
+      <text x="124" y="48" fill="#38bdf8" fontSize="9" fontFamily="sans-serif" letterSpacing="0.8" opacity="0.9">RELAY COORDINATE</text>
     </svg>
   );
 }
 
 function KineticMeshGraphic() {
   return (
-    <svg viewBox="0 0 224 224" className="w-full h-44 sm:h-52 lg:h-60 overflow-visible">
+    <svg viewBox="0 0 224 224" className="w-full h-28 sm:h-32 lg:h-36 xl:h-40 max-h-[160px] overflow-visible">
       <defs>
         <linearGradient id="meshGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#6fa3d4" stopOpacity="0.2" />
@@ -100,7 +100,7 @@ function KineticMeshGraphic() {
       <line x1="24" y1="204" x2="204" y2="204" stroke="#1e456d" strokeWidth="1" opacity="0.4" />
       <circle cx="112" cy="100" r="4" fill="#38bdf8" />
       <circle cx="112" cy="100" r="10" fill="none" stroke="#38bdf8" strokeWidth="1" opacity="0.4" />
-      <text x="34" y="196" fill="#9dbfd9" fontSize="9" fontFamily="monospace" opacity="0.8">INTERACTION // 60 FPS</text>
+      <text x="34" y="196" fill="#9dbfd9" fontSize="9" fontFamily="sans-serif" letterSpacing="0.8" opacity="0.85">FLUID PHYSICS • 60 FPS</text>
     </svg>
   );
 }
@@ -154,7 +154,7 @@ export default function ServicesSection() {
   useEffect(() => {
     setIsMounted(true);
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -171,20 +171,20 @@ export default function ServicesSection() {
   const hintY       = useTransform(scrollYProgress, [0.03, 0.18], [0, -12]);
 
   // ── Card Break Transforms (0.08 → 0.68) ───────────────────────────
-  // Card 1: Translates right from center (calc(100% + 24px)) to left (0%), subtle -2.2deg tilt
+  // Card 1: Translates right from center (calc(100% + 20px)) to left (0%), subtle -2deg tilt
   const x1Val = useTransform(scrollYProgress, [0.08, 0.68], [100, 0]);
-  const x1Px  = useTransform(scrollYProgress, [0.08, 0.68], [24, 0]);
+  const x1Px  = useTransform(scrollYProgress, [0.08, 0.68], [20, 0]);
   const card1X = useMotionTemplate`calc(${x1Val}% + ${x1Px}px)`;
-  const card1Rotate = useTransform(scrollYProgress, [0.08, 0.68], [-2.2, 0]);
+  const card1Rotate = useTransform(scrollYProgress, [0.08, 0.68], [-2, 0]);
 
-  // Card 2: Remains in center column, subtle +1deg tilt
-  const card2Rotate = useTransform(scrollYProgress, [0.08, 0.68], [1.0, 0]);
+  // Card 2: Remains in center column, subtle +0.8deg tilt
+  const card2Rotate = useTransform(scrollYProgress, [0.08, 0.68], [0.8, 0]);
 
-  // Card 3: Translates left from center (calc(-100% - 24px)) to right (0%), subtle +2.8deg tilt
+  // Card 3: Translates left from center (calc(-100% - 20px)) to right (0%), subtle +2.2deg tilt
   const x3Val = useTransform(scrollYProgress, [0.08, 0.68], [-100, 0]);
-  const x3Px  = useTransform(scrollYProgress, [0.08, 0.68], [-24, 0]);
+  const x3Px  = useTransform(scrollYProgress, [0.08, 0.68], [-20, 0]);
   const card3X = useMotionTemplate`calc(${x3Val}% + ${x3Px}px)`;
-  const card3Rotate = useTransform(scrollYProgress, [0.08, 0.68], [2.8, 0]);
+  const card3Rotate = useTransform(scrollYProgress, [0.08, 0.68], [2.2, 0]);
 
   // Mobile vertical cascade
   const card1YMobile = useTransform(scrollYProgress, [0.08, 0.68], [140, 0]);
@@ -201,12 +201,12 @@ export default function ServicesSection() {
       {/* Anchor alias so previous #curriculum or #services both scroll here */}
       <div id="curriculum" className="absolute top-0 left-0" aria-hidden="true" />
 
-      {/* ── Mobile Layout (Clean Vertical Flow) ── */}
-      <div className="block md:hidden relative px-5 sm:px-8 py-16 text-[#ddeaf5] border-t border-[#1e456d]/40">
+      {/* ── Mobile & Tablet Layout (Clean Natural Flow) ── */}
+      <div className="block lg:hidden relative px-5 sm:px-8 md:px-12 py-16 sm:py-20 text-[#ddeaf5] border-t border-[#1e456d]/40">
         {/* Mobile Section Header */}
-        <div className="mb-10">
-          <span className="font-mono font-bold text-xs text-[#38bdf8] tracking-[0.14em] uppercase block mb-2.5">
-            MY SERVICES &amp; CAPABILITIES
+        <div className="mb-10 max-w-2xl">
+          <span className="font-sans text-xs font-semibold tracking-wider text-[#38bdf8] uppercase block mb-3">
+            Services &amp; Capabilities
           </span>
           <h2 className="font-serif font-bold text-3xl sm:text-4xl text-[#ddeaf5] tracking-tight leading-[1.1] mb-4">
             From system architecture to production
@@ -225,39 +225,40 @@ export default function ServicesSection() {
           </a>
         </div>
 
-        {/* Mobile Cards Stack */}
-        <div className="flex flex-col gap-6">
+        {/* Mobile & Tablet Cards Stack */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {serviceCards.map((service, sIdx) => (
             <div
               key={sIdx}
-              className="rounded-2xl bg-gradient-to-b from-[#132f4e]/95 via-[#0e243a]/95 to-[#091a2b] border border-[#1e456d]/75 p-6 flex flex-col justify-between shadow-[0_12px_36px_rgba(0,0,0,0.5)]"
+              className={`rounded-xl bg-gradient-to-b from-[#132f4e]/95 via-[#0e243a]/95 to-[#091a2b] border border-[#1e456d]/75 p-6 sm:p-7 flex flex-col justify-between shadow-[0_12px_36px_rgba(0,0,0,0.5)] ${
+                sIdx === 2 ? "md:col-span-2 md:max-w-xl md:mx-auto w-full" : ""
+              }`}
             >
               <div className="flex items-center justify-between gap-3 mb-4">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#163a5f]/60 border border-[#38bdf8]/30">
-                  <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-wider">SERVICE</span>
-                  <span className="font-mono text-xs font-bold text-[#38bdf8]">/{service.number}</span>
-                </div>
-                <span className="font-mono text-[10px] text-[#9dbfd9]/70 uppercase tracking-widest font-medium">
+                <span className="font-sans text-xs font-semibold text-[#38bdf8] tracking-wider uppercase">
+                  Service {service.number}
+                </span>
+                <span className="font-sans text-[11px] text-[#9dbfd9]/80 font-medium tracking-wide">
                   {service.tag}
                 </span>
               </div>
 
-              <div className="py-3 flex items-center justify-center">
+              <div className="py-2 flex items-center justify-center shrink min-h-0">
                 {service.graphic}
               </div>
 
               <div className="mt-4">
-                <h3 className="font-sans font-bold text-lg text-[#ddeaf5] tracking-tight leading-snug mb-2">
+                <h3 className="font-sans font-bold text-lg sm:text-xl text-[#ddeaf5] tracking-tight leading-snug mb-2">
                   {service.title}
                 </h3>
-                <p className="font-sans text-xs text-[#9dbfd9]/85 leading-relaxed">
+                <p className="font-sans text-sm sm:text-[15px] text-[#9dbfd9]/90 leading-relaxed">
                   {service.description}
                 </p>
-                <div className="mt-4 pt-3 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
+                <div className="mt-4 pt-3.5 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
                   {service.capabilities.map((item) => (
                     <span
                       key={item}
-                      className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
+                      className="font-sans text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
                     >
                       {item}
                     </span>
@@ -272,7 +273,7 @@ export default function ServicesSection() {
       {/* ── Desktop Layout (Sticky Viewport & 3-Card Deck Dealing) ── */}
       <div
         ref={containerRef}
-        className="hidden md:block relative"
+        className="hidden lg:block relative"
         style={{ height: `${RUNWAY_VH}vh` }}
       >
         {/* ── Sticky Viewport ─────────────────────────────────────────── */}
@@ -284,19 +285,19 @@ export default function ServicesSection() {
           </div>
 
         {/* ── STAGE CONTAINER: Left Editorial Column + Right 3-Card Stage ─── */}
-        <div className="relative z-10 flex-1 max-w-[1560px] mx-auto w-full px-6 md:px-10 lg:px-12 pt-[68px] pb-3 flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-12 items-center justify-between min-h-0">
+        <div className="relative z-10 flex-1 max-w-[1560px] mx-auto w-full px-6 lg:px-10 xl:px-12 pt-[68px] pb-3 flex flex-row gap-8 lg:gap-10 xl:gap-12 items-center justify-between min-h-0">
           
           {/* ── LEFT EDITORIAL COLUMN ───────────────────────────────────── */}
-          <div className="w-full lg:w-[300px] xl:w-[340px] shrink-0 flex flex-col justify-between self-stretch py-3">
+          <div className="w-[300px] xl:w-[340px] shrink-0 flex flex-col justify-between self-stretch py-3">
             {/* Top Area: Clearly Highlighting Services */}
             <div>
               <div className="mb-3.5">
-                <span className="font-mono font-bold text-base sm:text-lg lg:text-xl text-[#38bdf8] tracking-[0.14em] uppercase block">
-                  MY SERVICES &amp; CAPABILITIES
+                <span className="font-sans text-xs sm:text-sm font-semibold tracking-wider text-[#38bdf8] uppercase block">
+                  Services &amp; Capabilities
                 </span>
               </div>
 
-              <h2 className="font-serif font-bold text-3xl sm:text-4xl lg:text-[42px] xl:text-[48px] text-[#ddeaf5] tracking-tight leading-[1.08]">
+              <h2 className="font-serif font-bold text-3xl lg:text-[40px] xl:text-[46px] text-[#ddeaf5] tracking-tight leading-[1.08]">
                 From system<br />
                 architecture<br />
                 to production
@@ -308,28 +309,15 @@ export default function ServicesSection() {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#132f4c]/80 border border-[#38bdf8]/30 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md mt-6"
               >
                 <Layers3 className="w-3.5 h-3.5 text-[#38bdf8] animate-pulse" />
-                <span className="font-mono text-[10px] text-[#9dbfd9] tracking-widest uppercase">
+                <span className="font-sans text-[11px] font-medium text-[#9dbfd9] tracking-wider uppercase">
                   3 Core Services • Scroll To Deal
                 </span>
               </motion.div>
-
-              {/* Mobile CTA Button */}
-              <div className="mt-4 lg:hidden">
-                <a
-                  href="/contact"
-                  className="group relative inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#132f4c]/90 hover:bg-[#193c62] border border-[#38bdf8]/40 hover:border-[#38bdf8] text-[#ddeaf5] hover:text-white font-sans text-xs font-medium transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-                >
-                  <span>Need a system built? contact me</span>
-                  <span className="w-4 h-4 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-colors">
-                    <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors" />
-                  </span>
-                </a>
-              </div>
             </div>
 
             {/* Bottom Descriptor & Desktop CTA Button */}
-            <div className="hidden lg:flex flex-col gap-4 pt-6 border-t border-[#1e456d]/30">
-              <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/80 leading-relaxed max-w-[260px]">
+            <div className="flex flex-col gap-4 pt-6 border-t border-[#1e456d]/30">
+              <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/80 leading-relaxed max-w-[280px]">
                 A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
               </p>
               <div>
@@ -346,9 +334,9 @@ export default function ServicesSection() {
             </div>
           </div>
 
-          {/* ── RIGHT CARDS STAGE: Larger 3-Card Deck with Scroll Break ── */}
+          {/* ── RIGHT CARDS STAGE: Responsive 3-Card Deck with Scroll Deal ── */}
           <div className="flex-1 min-w-0 w-full h-full flex items-center justify-center relative">
-            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch relative">
+            <div className="w-full grid grid-cols-3 gap-4 lg:gap-5 xl:gap-6 items-stretch relative">
               
               {/* ── CARD 01 (Web Applications & SaaS) ──────────────────── */}
               <motion.div
@@ -357,37 +345,36 @@ export default function ServicesSection() {
                   y: isMounted && isMobile ? card1YMobile : 0,
                   rotate: card1Rotate,
                 }}
-                className="z-30 will-change-transform transform-gpu group relative rounded-[32px] bg-gradient-to-b from-[#132f4e]/95 via-[#0e243a]/95 to-[#091a2b] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-7 sm:p-8 lg:p-8 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[70vh] min-h-[540px] max-h-[660px]"
+                className="z-30 will-change-transform transform-gpu group relative rounded-xl bg-gradient-to-b from-[#132f4e]/95 via-[#0e243a]/95 to-[#091a2b] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-5 sm:p-6 lg:p-6 xl:p-7 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[min(65vh,580px)] min-h-[440px] max-h-[580px]"
               >
                 {/* Top: Clear Service Number & Category */}
                 <div className="flex items-center justify-between gap-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#163a5f]/60 border border-[#38bdf8]/30">
-                    <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-wider">SERVICE</span>
-                    <span className="font-mono text-xs font-bold text-[#38bdf8]">/{serviceCards[0].number}</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-[#9dbfd9]/70 uppercase tracking-widest font-medium">
+                  <span className="font-sans text-xs font-semibold text-[#38bdf8] tracking-wider uppercase">
+                    Service {serviceCards[0].number}
+                  </span>
+                  <span className="font-sans text-[11px] text-[#9dbfd9]/80 font-medium tracking-wide">
                     {serviceCards[0].tag}
                   </span>
                 </div>
 
                 {/* Middle: Halftone Graphic */}
-                <div className="my-auto py-4 flex items-center justify-center">
+                <div className="my-auto py-2 flex items-center justify-center shrink min-h-0">
                   {serviceCards[0].graphic}
                 </div>
 
                 {/* Bottom: Title, Description & Capabilities */}
                 <div>
-                  <h3 className="font-sans font-bold text-xl lg:text-[22px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2.5">
+                  <h3 className="font-sans font-bold text-lg lg:text-xl xl:text-[21px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2">
                     {serviceCards[0].title}
                   </h3>
-                  <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/85 leading-relaxed">
+                  <p className="font-sans text-sm sm:text-[15px] text-[#9dbfd9]/90 leading-relaxed line-clamp-3 xl:line-clamp-none">
                     {serviceCards[0].description}
                   </p>
-                  <div className="mt-4 pt-3.5 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
+                  <div className="mt-3.5 pt-3 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
                     {serviceCards[0].capabilities.map((item) => (
                       <span
                         key={item}
-                        className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
+                        className="font-sans text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
                       >
                         {item}
                       </span>
@@ -401,37 +388,36 @@ export default function ServicesSection() {
                 style={{
                   rotate: card2Rotate,
                 }}
-                className="z-20 will-change-transform transform-gpu group relative rounded-[32px] bg-gradient-to-b from-[#112946]/95 via-[#0d2136]/95 to-[#081827] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-7 sm:p-8 lg:p-8 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[70vh] min-h-[540px] max-h-[660px]"
+                className="z-20 will-change-transform transform-gpu group relative rounded-xl bg-gradient-to-b from-[#112946]/95 via-[#0d2136]/95 to-[#081827] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-5 sm:p-6 lg:p-6 xl:p-7 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[min(65vh,580px)] min-h-[440px] max-h-[580px]"
               >
                 {/* Top: Clear Service Number & Category */}
                 <div className="flex items-center justify-between gap-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#163a5f]/60 border border-[#38bdf8]/30">
-                    <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-wider">SERVICE</span>
-                    <span className="font-mono text-xs font-bold text-[#38bdf8]">/{serviceCards[1].number}</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-[#9dbfd9]/70 uppercase tracking-widest font-medium">
+                  <span className="font-sans text-xs font-semibold text-[#38bdf8] tracking-wider uppercase">
+                    Service {serviceCards[1].number}
+                  </span>
+                  <span className="font-sans text-[11px] text-[#9dbfd9]/80 font-medium tracking-wide">
                     {serviceCards[1].tag}
                   </span>
                 </div>
 
                 {/* Middle: Telemetry Graphic */}
-                <div className="my-auto py-4 flex items-center justify-center">
+                <div className="my-auto py-2 flex items-center justify-center shrink min-h-0">
                   {serviceCards[1].graphic}
                 </div>
 
                 {/* Bottom: Title, Description & Capabilities */}
                 <div>
-                  <h3 className="font-sans font-bold text-xl lg:text-[22px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2.5">
+                  <h3 className="font-sans font-bold text-lg lg:text-xl xl:text-[21px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2">
                     {serviceCards[1].title}
                   </h3>
-                  <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/85 leading-relaxed">
+                  <p className="font-sans text-sm sm:text-[15px] text-[#9dbfd9]/90 leading-relaxed line-clamp-3 xl:line-clamp-none">
                     {serviceCards[1].description}
                   </p>
-                  <div className="mt-4 pt-3.5 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
+                  <div className="mt-3.5 pt-3 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
                     {serviceCards[1].capabilities.map((item) => (
                       <span
                         key={item}
-                        className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
+                        className="font-sans text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
                       >
                         {item}
                       </span>
@@ -447,37 +433,36 @@ export default function ServicesSection() {
                   y: isMounted && isMobile ? card3YMobile : 0,
                   rotate: card3Rotate,
                 }}
-                className="z-10 will-change-transform transform-gpu group relative rounded-[32px] bg-gradient-to-b from-[#0f243d]/95 via-[#0b1c2d]/95 to-[#071523] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-7 sm:p-8 lg:p-8 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[70vh] min-h-[540px] max-h-[660px]"
+                className="z-10 will-change-transform transform-gpu group relative rounded-xl bg-gradient-to-b from-[#0f243d]/95 via-[#0b1c2d]/95 to-[#071523] border border-[#1e456d]/75 hover:border-[#38bdf8]/60 p-5 sm:p-6 lg:p-6 xl:p-7 flex flex-col justify-between transition-[border-color,box-shadow] duration-300 shadow-[0_24px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(56,189,248,0.1)] h-[min(65vh,580px)] min-h-[440px] max-h-[580px]"
               >
                 {/* Top: Clear Service Number & Category */}
                 <div className="flex items-center justify-between gap-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#163a5f]/60 border border-[#38bdf8]/30">
-                    <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-wider">SERVICE</span>
-                    <span className="font-mono text-xs font-bold text-[#38bdf8]">/{serviceCards[2].number}</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-[#9dbfd9]/70 uppercase tracking-widest font-medium">
+                  <span className="font-sans text-xs font-semibold text-[#38bdf8] tracking-wider uppercase">
+                    Service {serviceCards[2].number}
+                  </span>
+                  <span className="font-sans text-[11px] text-[#9dbfd9]/80 font-medium tracking-wide">
                     {serviceCards[2].tag}
                   </span>
                 </div>
 
                 {/* Middle: Kinetic Mesh Graphic */}
-                <div className="my-auto py-4 flex items-center justify-center">
+                <div className="my-auto py-2 flex items-center justify-center shrink min-h-0">
                   {serviceCards[2].graphic}
                 </div>
 
                 {/* Bottom: Title, Description & Capabilities */}
                 <div>
-                  <h3 className="font-sans font-bold text-xl lg:text-[22px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2.5">
+                  <h3 className="font-sans font-bold text-lg lg:text-xl xl:text-[21px] text-[#ddeaf5] tracking-tight group-hover:text-white transition-colors leading-snug mb-2">
                     {serviceCards[2].title}
                   </h3>
-                  <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/85 leading-relaxed">
+                  <p className="font-sans text-sm sm:text-[15px] text-[#9dbfd9]/90 leading-relaxed line-clamp-3 xl:line-clamp-none">
                     {serviceCards[2].description}
                   </p>
-                  <div className="mt-4 pt-3.5 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
+                  <div className="mt-3.5 pt-3 border-t border-[#1e456d]/40 flex flex-wrap gap-1.5">
                     {serviceCards[2].capabilities.map((item) => (
                       <span
                         key={item}
-                        className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
+                        className="font-sans text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#163554]/70 text-[#9dbfd9] border border-[#1e456d]/50"
                       >
                         {item}
                       </span>
@@ -493,8 +478,8 @@ export default function ServicesSection() {
 
         {/* ── FOOTER / PROGRESS BAR ──────────────────────────────────── */}
         <footer className="relative z-20 flex-none px-6 md:px-10 lg:px-12 py-3 max-w-[1560px] mx-auto w-full flex items-center justify-between gap-4 border-t border-[#1e456d]/30 bg-[#0b1c2e]/90 backdrop-blur-sm">
-          <span className="font-mono text-[10px] text-[#6fa3d4]/80 uppercase tracking-widest">
-            02 // SERVICES OVERVIEW
+          <span className="font-sans text-xs font-medium text-[#9dbfd9] tracking-wider uppercase">
+            Services &amp; Architecture
           </span>
 
           {/* Hairline Progress Bar */}
@@ -505,7 +490,7 @@ export default function ServicesSection() {
                 className="h-full bg-gradient-to-r from-[#6fa3d4] to-[#38bdf8] origin-left"
               />
             </div>
-            <span className="font-mono text-[9px] text-[#6fa3d4] uppercase tracking-widest whitespace-nowrap">
+            <span className="font-sans text-[10px] text-[#6fa3d4] uppercase tracking-wider whitespace-nowrap font-medium">
               scroll to explore →
             </span>
           </div>

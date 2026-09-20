@@ -133,10 +133,10 @@ function WorkContent({
           </p>
         </div>
         <span
-          style={{ color: palette.counter }}
-          className="hidden md:block font-mono text-[10px] uppercase tracking-widest self-end pb-1"
+          className="hidden md:block font-sans text-xs uppercase tracking-widest self-end pb-1 font-medium"
+          style={{ color: palette.subtitle }}
         >
-          01 / Selected
+          Featured Case Studies
         </span>
       </motion.header>
 
