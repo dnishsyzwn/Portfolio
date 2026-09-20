@@ -84,24 +84,36 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "Person",
-      "@id": `${siteUrl}/#person`,
-      name: "Danish Syazwan",
-      jobTitle: "Full-Stack Developer",
+      "@type": "ProfilePage",
+      "@id": `${siteUrl}/#profilepage`,
       url: siteUrl,
-      sameAs: [
-        "https://github.com/dnishsyzwn",
-        "https://www.linkedin.com/in/danish-syazwan-109725339/",
-      ],
-      knowsAbout: [
-        "Full-Stack Development",
-        "Next.js",
-        "React",
-        "TypeScript",
-        "Distributed Systems",
-        "Interactive UI Design",
-        "Node.js",
-      ],
+      name: "Danish Syazwan — Full-Stack Developer",
+      dateCreated: "2024-01-01T00:00:00.000Z",
+      dateModified: "2026-09-20T22:00:00.000Z",
+      mainEntity: {
+        "@type": "Person",
+        "@id": `${siteUrl}/#person`,
+        name: "Danish Syazwan",
+        alternateName: "dnishsyzwn",
+        jobTitle: "Full-Stack Developer",
+        description:
+          "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
+        url: siteUrl,
+        image: `${siteUrl}/syncuid.png`,
+        sameAs: [
+          "https://github.com/dnishsyzwn",
+          "https://www.linkedin.com/in/danish-syazwan-109725339/",
+        ],
+        knowsAbout: [
+          "Full-Stack Development",
+          "Next.js",
+          "React",
+          "TypeScript",
+          "Distributed Systems",
+          "Interactive UI Design",
+          "Node.js",
+        ],
+      },
     },
     {
       "@type": "WebSite",
@@ -124,13 +136,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="lenis lenis-smooth">
-      <head>
+      <body className="relative bg-white text-navy font-sans selection:bg-[#c8e4f8] selection:text-[#1b4c78]">
+        {/* JSON-LD Structured Data for Google Rich Results & Knowledge Graph */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </head>
-      <body className="relative bg-white text-navy font-sans selection:bg-[#c8e4f8] selection:text-[#1b4c78]">
+
         {/* Preloader Entrance Sequence (Inspired by landonorris.com) */}
         <Preloader />
 
