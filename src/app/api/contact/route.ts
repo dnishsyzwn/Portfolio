@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const smtpUser = process.env.SMTP_USER?.trim();
     const smtpPass = process.env.SMTP_PASS?.replace(/\s+/g, "");
     const recipientEmail =
-      process.env.CONTACT_RECEIVER_EMAIL || "rvg.peanut@gmail.com";
+      process.env.CONTACT_RECEIVER_EMAIL || process.env.SMTP_USER;
 
     // Check if credentials are present
     if (!smtpUser || !smtpPass) {
