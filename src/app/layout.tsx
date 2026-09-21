@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     siteName: "Danish Syazwan Portfolio",
     images: [
       {
-        url: "/syncuid.png",
+        url: "/seoPortfolioImage.png",
         width: 1200,
         height: 630,
         alt: "Danish Syazwan — Full-Stack Developer Portfolio",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "Danish Syazwan — Full-Stack Developer",
     description:
       "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
-    images: ["/syncuid.png"],
+    images: ["/seoPortfolioImage.png"],
     creator: "@dnishsyzwn",
   },
   robots: {
@@ -99,7 +99,7 @@ const jsonLd = {
         description:
           "Full-stack developer crafting high-performance distributed web systems, reactive architectures, and fluid interactive experiences.",
         url: siteUrl,
-        image: `${siteUrl}/syncuid.png`,
+        image: `${siteUrl}/seoPortfolioImage.png`,
         sameAs: [
           "https://github.com/dnishsyzwn",
           "https://www.linkedin.com/in/danish-syazwan-109725339/",
