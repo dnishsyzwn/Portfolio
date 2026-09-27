@@ -324,6 +324,10 @@ export default function SilkHero() {
                   View work
                 </a>
 
+                <a href="/pricing" className="bracket-btn text-base font-normal">
+                  My Pricing
+                </a>
+
                 <a
                   href="https://github.com/dnishsyzwn"
                   target="_blank"

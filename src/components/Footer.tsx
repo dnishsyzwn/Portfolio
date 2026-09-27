@@ -128,7 +128,7 @@ export default function Footer() {
             </div>
             <div>
               <a
-                href="#work"
+                href="/#work"
                 className="text-[#1b4c78] hover:text-sky transition-colors"
               >
                 Work &amp; Case Studies
@@ -136,7 +136,7 @@ export default function Footer() {
             </div>
             <div>
               <a
-                href="#services"
+                href="/#services"
                 className="text-[#1b4c78] hover:text-sky transition-colors"
               >
                 Services &amp; Architecture
@@ -144,10 +144,18 @@ export default function Footer() {
             </div>
             <div>
               <a
-                href="#stack"
+                href="/#stack"
                 className="text-[#1b4c78] hover:text-sky transition-colors"
               >
                 Technical Arsenal
+              </a>
+            </div>
+            <div>
+              <a
+                href="/pricing"
+                className="text-[#1b4c78] hover:text-sky transition-colors"
+              >
+                My Pricing
               </a>
             </div>
           </div>

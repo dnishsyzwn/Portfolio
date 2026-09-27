@@ -171,6 +171,7 @@ export default function Topbar() {
             { label: "Work", href: "/#work" },
             { label: "Services", href: "/#services" },
             { label: "Stack", href: "/#stack" },
+            { label: "My Pricing", href: "/pricing" },
           ].map((item) => (
             <a
               key={item.href}
@@ -228,6 +229,7 @@ export default function Topbar() {
               { label: "Work", href: "/#work" },
               { label: "Services", href: "/#services" },
               { label: "Stack", href: "/#stack" },
+              { label: "My Pricing", href: "/pricing" },
             ].map((item) => (
               <a
                 key={item.href}

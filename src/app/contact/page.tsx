@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
@@ -28,6 +29,17 @@ const VIDEOS: ProjectVideo[] = [
     title: "Project Showcase 3",
   },
 ];
+
+function ContactPlanPrefill({ setMessage }: { setMessage: (msg: string) => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const plan = searchParams.get("plan");
+    if (plan) {
+      setMessage(`Hi Danish, I'm reaching out regarding the "${plan}" plan. Let's discuss getting started!`);
+    }
+  }, [searchParams, setMessage]);
+  return null;
+}
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -123,6 +135,11 @@ export default function ContactPage() {
     <div className="relative min-h-screen bg-[#0b1c2e] text-white pt-20 sm:pt-24 pb-16 sm:pb-20 px-4 sm:px-10 lg:px-16 selection:bg-[#38bdf8] selection:text-[#0b1c2e]">
       {/* Anchor for Topbar to apply dark theme nav styles */}
       <div id="services" className="fixed inset-0 pointer-events-none -z-50" aria-hidden="true" />
+
+      {/* Prefill message if navigated with ?plan= query */}
+      <Suspense fallback={null}>
+        <ContactPlanPrefill setMessage={setMessage} />
+      </Suspense>
 
       {/* Standard, Clean Button with High Contrast & Standard Font */}
       <motion.div

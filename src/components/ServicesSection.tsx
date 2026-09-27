@@ -211,18 +211,30 @@ export default function ServicesSection() {
           <h2 className="font-serif font-bold text-3xl sm:text-4xl text-[#ddeaf5] tracking-tight leading-[1.1] mb-4">
             From system architecture to production
           </h2>
-          <p className="font-sans text-xs sm:text-sm text-[#9dbfd9]/80 leading-relaxed mb-6">
+          <p className="font-sans text-base sm:text-[17px] text-[#ddeaf5]/90 leading-relaxed mb-6 font-normal">
             A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
           </p>
-          <a
-            href="/contact"
-            className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#132f4c]/90 hover:bg-[#193c62] border border-[#38bdf8]/40 text-[#ddeaf5] font-sans text-xs font-medium transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-          >
-            <span>Need a system built? Contact me</span>
-            <span className="w-4 h-4 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-colors">
-              <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors" />
-            </span>
-          </a>
+          <div className="flex flex-col sm:flex-row items-start gap-3">
+            <a
+              href="/pricing"
+              className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full w-fit self-start bg-[#38bdf8] hover:bg-[#60cdff] text-[#0b1c2e] font-sans text-sm sm:text-base font-semibold transition-all shadow-[0_4px_20px_rgba(56,189,248,0.3)] hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <span>View Pricing &amp; Plans</span>
+              <span className="w-5 h-5 rounded-full bg-[#0b1c2e]/15 group-hover:bg-[#0b1c2e] flex items-center justify-center transition-colors shrink-0">
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#0b1c2e] group-hover:text-white transition-colors" />
+              </span>
+            </a>
+
+            <a
+              href="/contact"
+              className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full w-fit self-start bg-[#132f4c]/90 hover:bg-[#193c62] border border-[#38bdf8]/40 text-[#ddeaf5] font-sans text-sm sm:text-base font-medium transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <span>Need a system built? Contact me</span>
+              <span className="w-5 h-5 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-colors shrink-0">
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors" />
+              </span>
+            </a>
+          </div>
         </div>
 
         {/* Mobile & Tablet Cards Stack */}
@@ -317,16 +329,26 @@ export default function ServicesSection() {
 
             {/* Bottom Descriptor & Desktop CTA Button */}
             <div className="flex flex-col gap-4 pt-6 border-t border-[#1e456d]/30">
-              <p className="font-sans text-xs sm:text-[13px] text-[#9dbfd9]/80 leading-relaxed max-w-[280px]">
+              <p className="font-sans text-[15px] sm:text-base xl:text-[16.5px] text-[#ddeaf5]/90 leading-relaxed max-w-[340px] font-normal">
                 A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
               </p>
-              <div>
+              <div className="flex flex-col items-start gap-2.5">
+                <a
+                  href="/pricing"
+                  className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full w-fit self-start bg-[#38bdf8] hover:bg-[#60cdff] text-[#0b1c2e] font-sans text-[13.5px] sm:text-[14.5px] font-semibold tracking-wide transition-all duration-300 shadow-[0_4px_20px_rgba(56,189,248,0.3)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.45)] hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <span>View Pricing &amp; Plans</span>
+                  <span className="w-5 h-5 rounded-full bg-[#0b1c2e]/15 group-hover:bg-[#0b1c2e] flex items-center justify-center transition-all duration-300 shrink-0">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#0b1c2e] group-hover:text-white transition-colors duration-300" />
+                  </span>
+                </a>
+
                 <a
                   href="/contact"
-                  className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#132f4c]/80 hover:bg-[#193c62] border border-[#38bdf8]/40 hover:border-[#38bdf8] text-[#ddeaf5] hover:text-white font-sans text-xs sm:text-[13px] font-medium tracking-wide transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.35),0_0_15px_rgba(56,189,248,0.1)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.25)] hover:-translate-y-0.5 active:translate-y-0"
+                  className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full w-fit self-start bg-[#132f4c]/70 hover:bg-[#193c62] border border-[#38bdf8]/35 hover:border-[#38bdf8] text-[#ddeaf5] hover:text-white font-sans text-[13.5px] sm:text-[14.5px] font-medium tracking-wide transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <span>Need a system built? contact me</span>
-                  <span className="w-5 h-5 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-all duration-300">
+                  <span className="w-5 h-5 rounded-full bg-[#38bdf8]/15 group-hover:bg-[#38bdf8] flex items-center justify-center transition-all duration-300 shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5 text-[#38bdf8] group-hover:text-[#0b1c2e] transition-colors duration-300" />
                   </span>
                 </a>
