@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ArrowUpRight } from "lucide-react";
 
 // Linear interpolation helper
 function lerp(a: number, b: number, t: number): number {
@@ -17,16 +17,53 @@ function lerpColor(
   const r = Math.round(lerp(c1[0], c2[0], t));
   const g = Math.round(lerp(c1[1], c2[1], t));
   const b = Math.round(lerp(c1[2], c2[2], t));
-  const a = +(lerp(c1[3], c2[3], t)).toFixed(3);
+  const a = +lerp(c1[3], c2[3], t).toFixed(3);
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
+interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: "home", label: "Home", href: "/#top" },
+  { id: "work", label: "Projects", href: "/#work" },
+  { id: "services", label: "Services", href: "/#services" },
+  { id: "stack", label: "Stack", href: "/#stack" },
+  { id: "pricing", label: "Pricing", href: "/pricing" },
+  { id: "contact", label: "Contact", href: "/contact" },
+];
+
 export default function Topbar() {
   const headerRef = useRef<HTMLElement | null>(null);
+  const menuContainerRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [darknessRatio, setDarknessRatio] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const darknessRef = useRef(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(1200);
+  const [openHeight, setOpenHeight] = useState<number>(440);
 
+  // Track window width for responsive sizing
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Measure exact content height once to prevent layout thrashing
+  useEffect(() => {
+    if (contentRef.current) {
+      setOpenHeight(contentRef.current.scrollHeight + 42);
+    }
+  }, [windowWidth]);
+
+  // Dynamic scroll listener with debounced re-renders & direct CSS variable injection
   useEffect(() => {
     let animationFrameId: number;
 
@@ -35,31 +72,38 @@ export default function Topbar() {
       animationFrameId = requestAnimationFrame(() => {
         const scrollY = window.scrollY;
         const scrolled = scrollY > 30;
-        setIsScrolled(scrolled);
+        setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
 
         let darkness = 0;
 
+        const hero = document.getElementById("hero") || document.getElementById("top");
         const work = document.getElementById("work");
         const services = document.getElementById("services") || document.getElementById("curriculum");
+        const stack = document.getElementById("stack");
 
-        // 1. Calculate darkness in Work section during its color inversion scroll
+        // 1. Hero Section: SilkHero is light ice-blue/white, darkness = 0
+        if (hero) {
+          const heroRect = hero.getBoundingClientRect();
+          if (heroRect.top <= 0 && heroRect.bottom > 80) {
+            darkness = 0;
+          }
+        }
+
+        // 2. Work section
         if (work) {
           const rect = work.getBoundingClientRect();
           if (rect.top <= 0 && rect.bottom > 0) {
             const scrollableDist = rect.height - window.innerHeight;
             if (scrollableDist > 0) {
               const progress = Math.min(1, Math.max(0, -rect.top / scrollableDist));
-              // In WorkSection.tsx: background inverts between progress 0.08 and 0.72
-              if (progress >= 0.08 && progress <= 0.72) {
-                darkness = (progress - 0.08) / (0.72 - 0.08);
-              } else if (progress > 0.72) {
-                darkness = 1;
-              }
+              if (progress < 0.35) darkness = 0;
+              else if (progress <= 0.75) darkness = (progress - 0.35) / 0.4;
+              else darkness = 1;
             }
           }
         }
 
-        // 2. Calculate darkness in Services section (pure #0b1c2e)
+        // 3. Services section
         if (services) {
           const cRect = services.getBoundingClientRect();
           if (cRect.top <= 60 && cRect.bottom > 0) {
@@ -67,8 +111,7 @@ export default function Topbar() {
           }
         }
 
-        // 3. Calculate darkness in Stack section (solid #0b1c2e)
-        const stack = document.getElementById("stack");
+        // 4. Stack section
         if (stack) {
           const sRect = stack.getBoundingClientRect();
           if (sRect.top <= 60 && sRect.bottom > 0) {
@@ -81,188 +124,272 @@ export default function Topbar() {
           }
         }
 
-        setDarknessRatio(darkness);
+        // Throttled state updates to prevent re-render thrashing
+        const roundedDarkness = Math.round(darkness * 5) / 5;
+        if (Math.abs(roundedDarkness - darknessRef.current) >= 0.2) {
+          darknessRef.current = roundedDarkness;
+          setDarknessRatio(roundedDarkness);
+        }
 
-        // Apply dynamic CSS variables directly to header for instant 120 FPS reaction
         if (headerRef.current) {
-          const t = darkness;
-
-          // Header background: Completely invisible (transparent)
-          const bg = "transparent";
-          const border = "transparent";
-
-          // Brand gradient stops
-          const titleStart = lerpColor([90, 127, 181, 1], [255, 255, 255, 1], t);
-          const titleEnd = lerpColor([40, 72, 117, 1], [157, 200, 232, 1], t);
-
-          // Subtitle
-          const subtitle = lerpColor([27, 76, 120, 0.55], [157, 200, 232, 0.70], t);
-
-          // Nav button text & brackets
-          const btnText = lerpColor([27, 76, 120, 0.9], [221, 234, 245, 0.95], t);
-          const btnBracket = lerpColor([63, 106, 166, 1], [56, 189, 248, 1], t);
-          const btnBg = "transparent";
-          const btnBorder = "transparent";
-
-          const style = headerRef.current.style;
-          style.setProperty("--nav-bg", bg);
-          style.setProperty("--nav-border", border);
-          style.setProperty("--nav-title-start", titleStart);
-          style.setProperty("--nav-title-end", titleEnd);
-          style.setProperty("--nav-subtitle", subtitle);
-          style.setProperty("--nav-btn-text", btnText);
-          style.setProperty("--nav-btn-bracket", btnBracket);
-          style.setProperty("--nav-btn-bg", btnBg);
-          style.setProperty("--nav-btn-border", btnBorder);
+          const titleColor = lerpColor([13, 39, 68, 1], [255, 255, 255, 1], darkness);
+          headerRef.current.style.setProperty("--nav-title-color", titleColor);
         }
       });
     };
 
-    const onResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-      handleScroll();
-    };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", onResize, { passive: true });
     handleScroll();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", onResize);
     };
   }, []);
+
+  // Close on outside click or Escape key
+  useEffect(() => {
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (menuContainerRef.current && !menuContainerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const handleNavClick = useCallback((href: string, e: React.MouseEvent) => {
+    setIsOpen(false);
+    if (href.startsWith("/#") && typeof window !== "undefined") {
+      const targetId = href.replace("/#", "");
+      if (window.location.pathname === "/") {
+        e.preventDefault();
+        if (targetId === "top") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.history.pushState(null, "", "/");
+        } else {
+          const el = document.getElementById(targetId);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            window.history.pushState(null, "", `#${targetId}`);
+          }
+        }
+      }
+    }
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  // Constant width matching the card
+  const menuWidth = isMobile ? Math.min(310, windowWidth - 32) : 310;
 
   return (
     <header
       ref={headerRef}
+      style={{ "--nav-title-color": darknessRatio > 0.5 ? "#ffffff" : "#0d2744" } as React.CSSProperties}
       className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-300 pointer-events-none bg-transparent ${
-        isScrolled ? "py-3 sm:py-3.5" : "py-4 sm:py-5"
+        isScrolled ? "py-2.5 sm:py-3.5" : "py-4 sm:py-5"
       }`}
     >
-      <div className="max-w-[1320px] mx-auto px-5 sm:px-6 md:px-12 flex items-center justify-between pointer-events-auto">
-        {/* Name / Brand */}
-        <div className="font-sans text-base sm:text-lg md:text-xl tracking-tight font-medium flex items-center">
+      {/* Hardware-accelerated backdrop overlay */}
+      <div
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
+        className={`fixed inset-0 z-30 bg-black/25 backdrop-blur-[1px] pointer-events-auto transition-opacity duration-200 ease-out ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      />
+
+      <div className="max-w-[1320px] mx-auto px-5 sm:px-6 md:px-12 flex items-center justify-between pointer-events-auto relative">
+        {/* Left: Brand Logo */}
+        <div className="flex-1 flex items-center justify-start z-40">
           <a
             href="/"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              backgroundImage:
-                "linear-gradient(to bottom, var(--nav-title-start, #5a7fb5), var(--nav-title-end, #284875))",
+            onClick={(e) => {
+              if (window.location.pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+              setIsOpen(false);
             }}
-            className="bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+            style={{ color: "var(--nav-title-color, #0d2744)" }}
+            className="font-mono text-xs sm:text-sm md:text-[15px] font-medium tracking-tight hover:opacity-80 transition-colors drop-shadow-sm select-none"
           >
-            Danish Syazwan
+            <span>Danish</span>
+            <span className="hidden xs:inline">.Syazwan</span>
           </a>
-          <span
-            style={{ color: "var(--nav-subtitle, rgba(27, 76, 120, 0.5))" }}
-            className="hidden sm:inline-block ml-3 text-xs font-mono tracking-normal font-normal transition-colors"
-          >
-            [ Full-Stack Developer ]
-          </span>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-2 md:gap-3">
-          {[
-            { label: "Work", href: "/#work" },
-            { label: "Services", href: "/#services" },
-            { label: "Stack", href: "/#stack" },
-            { label: "My Pricing", href: "/pricing" },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              style={
-                {
-                  "--btn-text": "var(--nav-btn-text, #1b4c78)",
-                  "--btn-bracket": "var(--nav-btn-bracket, #3f6aa6)",
-                  "--btn-bg": "transparent",
-                  "--btn-border": "transparent",
-                } as React.CSSProperties
-              }
-              className="bracket-adaptive-btn text-sm"
+        {/* Center: GPU-Accelerated Straight-Down Accordion Menu */}
+        <div
+          ref={menuContainerRef}
+          style={{ width: menuWidth }}
+          className="flex-none relative flex justify-center h-[42px] z-40"
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: isOpen ? `${openHeight}px` : "42px",
+              backgroundColor: isOpen
+                ? "#0b1c2e"
+                : darknessRatio > 0.5
+                ? "rgba(11, 28, 46, 0.75)"
+                : "#eef3f9",
+              borderRadius: 12,
+              border: isOpen
+                ? "1px solid rgba(56, 189, 248, 0.25)"
+                : darknessRatio > 0.5
+                ? "1px solid rgba(255, 255, 255, 0.15)"
+                : "1px solid rgba(27, 76, 120, 0.15)",
+              boxShadow: isOpen
+                ? "0 25px 60px -15px rgba(4, 15, 28, 0.7), 0 0 20px rgba(56, 189, 248, 0.08)"
+                : darknessRatio > 0.5
+                ? "0 4px 20px rgba(0, 0, 0, 0.35)"
+                : "0 1px 4px rgba(27, 76, 120, 0.05), 0 0 0 1px rgba(27, 76, 120, 0.08)",
+              transition:
+                "height 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease-out, border-color 0.2s ease, box-shadow 0.25s ease",
+              willChange: "height",
+              transform: "translateZ(0)",
+            }}
+            className="overflow-hidden backdrop-blur-md select-none"
+          >
+            {/* Top Row: Fixed 42px header */}
+            <button
+              type="button"
+              onClick={() => setIsOpen((prev) => !prev)}
+              aria-expanded={isOpen}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              className="w-full h-[42px] px-5 sm:px-6 flex items-center justify-between cursor-pointer focus:outline-none transition-colors"
             >
-              {item.label}
-            </a>
-          ))}
+              <span
+                className={`font-sans text-[13px] sm:text-[14px] font-medium tracking-tight transition-colors duration-200 ${
+                  isOpen
+                    ? "text-[#ddeaf5]"
+                    : darknessRatio > 0.5
+                    ? "text-white"
+                    : "text-[#0d2744]"
+                }`}
+              >
+                Menu
+              </span>
 
+              {/* Two Lines: 100% GPU transform rotation */}
+              <div className="w-6 h-5 relative flex items-center justify-center pointer-events-none">
+                <span
+                  style={{
+                    transform: isOpen ? "rotate(45deg) translateY(0)" : "rotate(0deg) translateY(-3.5px)",
+                    backgroundColor: isOpen
+                      ? "#38bdf8"
+                      : darknessRatio > 0.5
+                      ? "#ffffff"
+                      : "#0d2744",
+                    transition: "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease",
+                  }}
+                  className="absolute w-5 h-[1.5px] rounded-full will-change-transform"
+                />
+                <span
+                  style={{
+                    transform: isOpen ? "rotate(-45deg) translateY(0)" : "rotate(0deg) translateY(3.5px)",
+                    backgroundColor: isOpen
+                      ? "#38bdf8"
+                      : darknessRatio > 0.5
+                      ? "#ffffff"
+                      : "#0d2744",
+                  }}
+                  className="absolute w-5 h-[1.5px] rounded-full will-change-transform"
+                />
+              </div>
+            </button>
+
+            {/* Expanded Content: Hardware-accelerated reveal */}
+            <div
+              ref={contentRef}
+              className={`transition-opacity duration-200 border-t border-[#1e456d]/50 ${
+                isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              {/* Navigation Links: Flushed left to vertically align with "Menu" */}
+              <div className="flex flex-col py-1">
+                {NAV_ITEMS.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(item.href, e)}
+                    className="group relative flex items-center px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#1e456d]/30 hover:bg-[#102d4a]/40 transition-colors duration-150"
+                  >
+                    {/* 3D Spinning Cube: 0 width when idle (aligned with Menu), expands & pushes text on hover */}
+                    <div className="w-0 opacity-0 group-hover:w-3.5 group-hover:mr-2 group-hover:opacity-100 overflow-visible flex items-center justify-center transition-all duration-200 ease-out shrink-0 pointer-events-none">
+                      <div className="w-2.5 h-2.5 relative [perspective:140px]">
+                        <div className="w-2.5 h-2.5 relative cube-3d-spin">
+                          {/* 6 faces of the 3D rotating cube */}
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:translateZ(5px)]" />
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:rotateY(180deg)_translateZ(5px)]" />
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:rotateY(90deg)_translateZ(5px)]" />
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:rotateY(-90deg)_translateZ(5px)]" />
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:rotateX(90deg)_translateZ(5px)]" />
+                          <span className="absolute inset-0 border border-[#38bdf8] bg-[#38bdf8]/30 shadow-[0_0_6px_rgba(56,189,248,0.4)] [transform:rotateX(-90deg)_translateZ(5px)]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Navigation text starts flush with Menu when idle, pushed right when cube appears */}
+                    <span className="font-sans text-[14.5px] sm:text-[15px] tracking-tight text-[#ddeaf5]/90 group-hover:text-white font-normal group-hover:font-medium transition-colors duration-150">
+                      {item.label}
+                    </span>
+                  </a>
+                ))}
+              </div>
+
+              {/* Secondary info & contact links: aligned flush on px-5 sm:px-6 */}
+              <div className="px-5 sm:px-6 pt-3.5 pb-4 flex flex-col gap-2 border-t border-[#1e456d]/40">
+                <a
+                  href="mailto:danish.syazwan2005@gmail.com"
+                  className="font-sans text-[12.5px] text-[#ddeaf5]/70 hover:text-white flex items-center justify-between transition-colors group"
+                >
+                  <span>danish.syazwan2005@gmail.com</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+
+                <a
+                  href="https://github.com/dnishsyzwn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[12.5px] text-[#ddeaf5]/70 hover:text-white flex items-center justify-between transition-colors group"
+                >
+                  <span>github.com/dnishsyzwn</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#38bdf8] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Let's Talk CTA */}
+        <div className="flex-1 flex items-center justify-end z-40">
           <a
             href="/contact"
-            style={
-              {
-                "--btn-text": "var(--nav-btn-text, #1b4c78)",
-                "--btn-bracket": "var(--nav-btn-bracket, #3f6aa6)",
-                "--btn-bg": "transparent",
-                "--btn-border": "transparent",
-              } as React.CSSProperties
-            }
-            className="bracket-adaptive-btn text-sm font-medium"
+            onClick={() => setIsOpen(false)}
+            style={{ color: "var(--nav-title-color, #0d2744)" }}
+            className="font-sans text-xs sm:text-sm font-medium tracking-tight hover:opacity-80 transition-colors flex items-center gap-1 group drop-shadow-sm select-none"
           >
-            Contact
+            <span>Let&apos;s Talk</span>
           </a>
-        </nav>
-
-        {/* Mobile Hamburger Toggle Button */}
-        <div className="flex md:hidden items-center">
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            style={{ color: "var(--nav-btn-text, #1b4c78)" }}
-            className="p-2 -mr-2 rounded-lg hover:bg-black/5 active:scale-95 transition-all focus:outline-none"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Slide-down Navigation Panel */}
-      {mobileMenuOpen && (
-        <div className="md:hidden pointer-events-auto mt-2 mx-4 p-5 rounded-2xl bg-white/95 border border-[#1b4c78]/15 shadow-[0_20px_50px_rgba(27,76,120,0.2)] backdrop-blur-2xl text-[#1b4c78] animate-in fade-in slide-in-from-top-3 duration-200">
-          <div className="flex flex-col gap-2.5">
-            {[
-              { label: "Work", href: "/#work" },
-              { label: "Services", href: "/#services" },
-              { label: "Stack", href: "/#stack" },
-              { label: "My Pricing", href: "/pricing" },
-            ].map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-[#1b4c78]/5 transition-colors font-sans text-base font-medium"
-              >
-                <span>{item.label}</span>
-                <span className="font-mono text-xs text-[#3f6aa6]">[ ↗ ]</span>
-              </a>
-            ))}
-            <a
-              href="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-[#1b4c78]/5 hover:bg-[#1b4c78]/10 transition-colors font-sans text-base font-semibold text-[#1b4c78]"
-            >
-              <span>Contact</span>
-              <span className="font-mono text-xs text-[#38bdf8]">[ → ]</span>
-            </a>
-          </div>
-          <div className="mt-4 pt-3 border-t border-[#1b4c78]/10 flex items-center justify-between text-xs font-mono text-[#1b4c78]/60">
-            <span>[ Full-Stack Dev ]</span>
-            <a
-              href="https://github.com/dnishsyzwn"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#1b4c78] underline"
-            >
-              GitHub ↗
-            </a>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

@@ -11,8 +11,6 @@ export default function SilkHero() {
   const [isMobile, setIsMobile] = useState(false);
 
   // Scroll runway: 240vh total scroll distance
-  // start start: hero starts full screen
-  // end end: hero finishes zooming out & fades into white grid bg, then normal scroll continues
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -44,12 +42,12 @@ export default function SilkHero() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
     let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let width = (canvas.width = Math.min(window.innerWidth, 1920));
+    let height = (canvas.height = Math.min(window.innerHeight, 1080));
 
     let mouse = { x: width * 0.7, y: height * 0.4, targetX: width * 0.7, targetY: height * 0.4 };
 
@@ -58,12 +56,66 @@ export default function SilkHero() {
       mouse.targetY = e.clientY;
     };
 
+    // Pre-cached gradients (created ONCE on resize, never inside render loop!)
+    let baseGrad: CanvasGradient;
+    let ribbonGrads: CanvasGradient[] = [];
+    let glowGrad: CanvasGradient;
+
+    const buildGradients = (w: number, h: number, isMob: boolean) => {
+      // Base radiant background
+      baseGrad = ctx.createLinearGradient(0, 0, w, h);
+      if (isMob) {
+        baseGrad.addColorStop(0, "rgb(240, 248, 255)");
+        baseGrad.addColorStop(0.3, "rgb(224, 242, 254)");
+        baseGrad.addColorStop(0.65, "rgb(190, 224, 248)");
+        baseGrad.addColorStop(1, "rgb(164, 207, 240)");
+      } else {
+        baseGrad.addColorStop(0, "rgb(255, 255, 255)");
+        baseGrad.addColorStop(0.3, "rgb(240, 248, 255)");
+        baseGrad.addColorStop(0.65, "rgb(200, 228, 248)");
+        baseGrad.addColorStop(1, "rgb(164, 207, 240)");
+      }
+
+      // Ribbon waves gradients
+      const ribbonColors = [
+        { c1: "rgba(200, 228, 248, 0.55)", c2: "rgba(124, 184, 232, 0.45)", xOff: isMob ? w * 0.15 : w * 0.35 },
+        { c1: "rgba(164, 207, 240, 0.45)", c2: "rgba(237, 246, 255, 0.65)", xOff: isMob ? w * 0.35 : w * 0.55 },
+        { c1: "rgba(124, 184, 232, 0.35)", c2: "rgba(200, 228, 248, 0.4)", xOff: isMob ? w * 0.55 : w * 0.72 },
+        { c1: "rgba(245, 250, 255, 0.6)", c2: "rgba(164, 207, 240, 0.3)", xOff: isMob ? w * 0.75 : w * 0.85 },
+      ];
+
+      ribbonGrads = ribbonColors.map((r) => {
+        const g = ctx.createLinearGradient(r.xOff, 0, w, h);
+        g.addColorStop(0, r.c1);
+        g.addColorStop(1, r.c2);
+        return g;
+      });
+
+      // Ambient radial bloom behind headline
+      glowGrad = ctx.createRadialGradient(
+        w * (isMob ? 0.5 : 0.4),
+        h * (isMob ? 0.42 : 0.45),
+        isMob ? 20 : 50,
+        w * (isMob ? 0.5 : 0.4),
+        h * (isMob ? 0.42 : 0.45),
+        w * (isMob ? 0.85 : 0.6)
+      );
+      glowGrad.addColorStop(0, isMob ? "rgba(255, 255, 255, 0.55)" : "rgba(255, 255, 255, 0.85)");
+      glowGrad.addColorStop(0.5, "rgba(237, 246, 255, 0.3)");
+      glowGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+    };
+
     const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      setIsMobile(window.innerWidth < 768);
+      width = canvas.width = Math.min(window.innerWidth, 1920);
+      height = canvas.height = Math.min(window.innerHeight, 1080);
+      const isMob = window.innerWidth < 768;
+      setIsMobile(isMob);
+      buildGradients(width, height, isMob);
     };
     handleResize();
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("resize", handleResize);
 
     let isVisible = true;
     const observer = new IntersectionObserver(
@@ -79,63 +131,54 @@ export default function SilkHero() {
     observer.observe(canvas);
 
     let time = 0;
+    let lastTime = 0;
+    const fpsInterval = 1000 / 60; // Locked 60 FPS limiter
 
-    const render = () => {
+    const render = (now: number) => {
       if (!isVisible) return;
+      animationFrameId = requestAnimationFrame(render);
+
+      // Sleep canvas when hero has completely zoomed out and faded to 0 opacity
+      const scrollProgress = scrollYProgress ? scrollYProgress.get() : 0;
+      if (scrollProgress > 0.88) {
+        return;
+      }
+
+      if (now - lastTime < fpsInterval) return;
+      lastTime = now;
+
       time += 0.005;
 
       mouse.x += (mouse.targetX - mouse.x) * 0.04;
       mouse.y += (mouse.targetY - mouse.y) * 0.04;
 
-      ctx.clearRect(0, 0, width, height);
-
       const isMob = width < 768;
 
-      // Radiant background
-      const baseGrad = ctx.createLinearGradient(0, 0, width, height);
-      if (isMob) {
-        baseGrad.addColorStop(0, "rgba(240, 248, 255, 0.95)");
-        baseGrad.addColorStop(0.3, "rgba(224, 242, 254, 0.9)");
-        baseGrad.addColorStop(0.65, "rgba(190, 224, 248, 0.8)");
-        baseGrad.addColorStop(1, "rgba(164, 207, 240, 0.85)");
-      } else {
-        baseGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
-        baseGrad.addColorStop(0.3, "rgba(240, 248, 255, 0.9)");
-        baseGrad.addColorStop(0.65, "rgba(200, 228, 248, 0.75)");
-        baseGrad.addColorStop(1, "rgba(164, 207, 240, 0.85)");
-      }
+      // 1. Paint pre-computed base radiant background
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Flowing silk ribbon waves
+      // 2. Flowing silk ribbon waves (optimized math with squared distances)
       const ribbons = [
         {
-          color1: "rgba(200, 228, 248, 0.55)",
-          color2: "rgba(124, 184, 232, 0.45)",
           speed: 1.0,
           amp: isMob ? 65 : 120,
           freq: isMob ? 0.0025 : 0.0018,
           xOffset: isMob ? width * 0.15 : width * 0.35,
         },
         {
-          color1: "rgba(164, 207, 240, 0.45)",
-          color2: "rgba(237, 246, 255, 0.65)",
           speed: 0.8,
           amp: isMob ? 80 : 160,
           freq: isMob ? 0.002 : 0.0014,
           xOffset: isMob ? width * 0.35 : width * 0.55,
         },
         {
-          color1: "rgba(124, 184, 232, 0.35)",
-          color2: "rgba(200, 228, 248, 0.4)",
           speed: 1.2,
           amp: isMob ? 70 : 140,
           freq: isMob ? 0.0028 : 0.002,
           xOffset: isMob ? width * 0.55 : width * 0.72,
         },
         {
-          color1: "rgba(245, 250, 255, 0.6)",
-          color2: "rgba(164, 207, 240, 0.3)",
           speed: 0.7,
           amp: isMob ? 90 : 190,
           freq: isMob ? 0.0018 : 0.0012,
@@ -143,58 +186,51 @@ export default function SilkHero() {
         },
       ];
 
-      ribbons.forEach((ribbon, i) => {
+      const stepY = isMob ? 42 : 50;
+      const maxMouseDistSq = 380 * 380;
+
+      for (let i = 0; i < ribbons.length; i++) {
+        const ribbon = ribbons[i];
         ctx.beginPath();
         const t = time * ribbon.speed;
-
-        const startX = ribbon.xOffset + Math.sin(t + i) * 60 + ((mouse.x - width / 2) * (i + 1) * 0.06);
+        const startX = ribbon.xOffset + Math.sin(t + i) * 60 + ((mouse.x - width * 0.5) * (i + 1) * 0.05);
 
         ctx.moveTo(startX, -50);
 
-        for (let y = -50; y <= height + 50; y += 35) {
+        for (let y = -50; y <= height + 50; y += stepY) {
           const distortion =
             Math.sin(y * ribbon.freq + t) * ribbon.amp +
             Math.cos(y * ribbon.freq * 2.2 - t * 0.8) * (ribbon.amp * 0.4);
 
-          const dx = mouse.x - (startX + distortion);
+          const rawX = startX + distortion;
+          const dx = mouse.x - rawX;
           const dy = mouse.y - y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const mouseEffect = Math.max(0, 1 - dist / 380) * 45;
+          const distSq = dx * dx + dy * dy;
 
-          const cx = startX + distortion - (dx / (dist + 1)) * mouseEffect;
-          ctx.lineTo(cx, y);
+          if (distSq < maxMouseDistSq) {
+            const dist = Math.sqrt(distSq);
+            const mouseEffect = (1 - dist / 380) * 45;
+            const cx = rawX - (dx / (dist + 1)) * mouseEffect;
+            ctx.lineTo(cx, y);
+          } else {
+            ctx.lineTo(rawX, y);
+          }
         }
 
-        ctx.lineTo(width + 100, height + 50);
-        ctx.lineTo(width + 100, -50);
+        ctx.lineTo(width + 80, height + 50);
+        ctx.lineTo(width + 80, -50);
         ctx.closePath();
 
-        const grad = ctx.createLinearGradient(ribbon.xOffset, 0, width, height);
-        grad.addColorStop(0, ribbon.color1);
-        grad.addColorStop(1, ribbon.color2);
-        ctx.fillStyle = grad;
+        ctx.fillStyle = ribbonGrads[i];
         ctx.fill();
-      });
+      }
 
-      // Ambient radial bloom behind headline
-      const glow = ctx.createRadialGradient(
-        width * (isMob ? 0.5 : 0.4),
-        height * (isMob ? 0.42 : 0.45),
-        isMob ? 20 : 50,
-        width * (isMob ? 0.5 : 0.4),
-        height * (isMob ? 0.42 : 0.45),
-        width * (isMob ? 0.85 : 0.6)
-      );
-      glow.addColorStop(0, isMob ? "rgba(255, 255, 255, 0.55)" : "rgba(255, 255, 255, 0.85)");
-      glow.addColorStop(0.5, "rgba(237, 246, 255, 0.3)");
-      glow.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = glow;
+      // 3. Paint pre-computed ambient radial bloom
+      ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, width, height);
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       observer.disconnect();
@@ -202,7 +238,7 @@ export default function SilkHero() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [scrollYProgress]);
 
   return (
     // 240vh Scroll runway on desktop; natural viewport flow on mobile
@@ -242,12 +278,12 @@ export default function SilkHero() {
           }
           className={`relative w-full ${
             isMobile ? "min-h-[100svh] bg-[#edf6ff]" : "h-full max-w-[100vw] max-h-[100vh] bg-white"
-          } flex items-center justify-center overflow-hidden origin-center will-change-transform`}
+          } flex items-center justify-center overflow-hidden origin-center will-change-transform [transform:translateZ(0)]`}
         >
           {/* Silk Canvas Simulation background */}
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-95"
+            className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-95 [transform:translateZ(0)]"
             aria-hidden="true"
           />
 
@@ -319,37 +355,34 @@ export default function SilkHero() {
                   <ArrowDownLeft className="w-5 h-5 text-sky transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
                   <span>Let&apos;s Talk</span>
                 </a>
-
-                <a href="#work" className="bracket-btn text-base font-normal">
-                  View work
-                </a>
-
-                <a href="/pricing" className="bracket-btn text-base font-normal">
-                  My Pricing
-                </a>
-
+                <span className="text-sky/40 font-light select-none">/</span>
                 <a
-                  href="https://github.com/dnishsyzwn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bracket-btn text-base font-normal text-navy/70 hover:text-navy"
+                  href="#work"
+                  className="inline-flex items-center gap-1.5 text-[#1b4c78] font-normal hover:text-[#2e5189] transition-colors group"
                 >
-                  GitHub ↗
+                  <span>Selected Works</span>
+                  <ChevronDown className="w-4 h-4 text-sky/70 transition-transform group-hover:translate-y-0.5" />
                 </a>
               </motion.div>
             </div>
           </motion.div>
-
-          {/* Minimalist scroll prompt pill */}
-          <motion.div
-            style={isMobile ? { opacity: 1 } : { opacity: scrollIndicatorOpacity }}
-            className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 z-30 font-mono text-[10px] sm:text-[11px] text-[#1b4c78]/60 flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm px-3 py-1.5 border border-[#1b4c78]/15 rounded-full"
-          >
-            <span>{isMobile ? "SCROLL DOWN" : "SCROLL TO ZOOM"}</span>
-            <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
-          </motion.div>
         </motion.div>
       </div>
+
+      {/* Floating Scroll Down Indicator (fades out as runway starts) */}
+      <motion.div
+        style={{ opacity: scrollIndicatorOpacity }}
+        className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex-col items-center gap-2 pointer-events-none"
+      >
+        <span className="font-mono text-[10px] text-[#1b4c78]/60 tracking-widest uppercase">
+          Scroll
+        </span>
+        <motion.div
+          animate={{ y: [0, 6, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="w-1 h-3 rounded-full bg-[#1b4c78]/30"
+        />
+      </motion.div>
     </div>
   );
 }

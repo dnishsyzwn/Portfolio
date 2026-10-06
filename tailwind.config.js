@@ -31,6 +31,7 @@ module.exports = {
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Plus Jakarta Sans", "Inter Tight", "Geist", "-apple-system", "sans-serif"],
+        display: ["var(--font-display)", "Playfair Display", "Cormorant Garamond", "Georgia", "serif"],
         sans: ["var(--font-sans)", "Geist", "Inter", "system-ui", "-apple-system", "sans-serif"],
         mono: ["var(--font-mono)", "Geist Mono", "JetBrains Mono", "ui-monospace", "monospace"],
       },
@@ -43,6 +44,8 @@ module.exports = {
       animation: {
         marquee: "marquee 32s linear infinite",
         "glass-sweep": "glass-sweep 9s ease-in-out infinite",
+        swim: "swim 15s linear infinite",
+        drift: "drift 8s ease-in-out infinite alternate",
       },
       keyframes: {
         marquee: {
@@ -52,6 +55,18 @@ module.exports = {
         "glass-sweep": {
           "0%, 58%": { backgroundPosition: "0% 0" },
           "88%, 100%": { backgroundPosition: "100% 0" },
+        },
+        swim: {
+          "0%": { transform: "translateX(-150px) translateY(0) scaleX(1)" },
+          "25%": { transform: "translateX(25vw) translateY(20px) scaleX(1)" },
+          "50%": { transform: "translateX(50vw) translateY(-10px) scaleX(1)" },
+          "75%": { transform: "translateX(75vw) translateY(15px) scaleX(1)" },
+          "100%": { transform: "translateX(calc(100vw + 150px)) translateY(0) scaleX(1)" },
+        },
+        drift: {
+          "0%": { transform: "translateY(0px) rotate(0deg)" },
+          "50%": { transform: "translateY(-10px) rotate(2deg)" },
+          "100%": { transform: "translateY(5px) rotate(-2deg)" },
         },
       },
     },

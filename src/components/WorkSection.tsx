@@ -6,8 +6,12 @@ import {
   useScroll,
   useTransform,
   useMotionTemplate,
+  useMotionValue,
+  useSpring,
+  AnimatePresence,
   MotionValue,
 } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Each project: label (small mono caps), an image/visual, and a serif title.
@@ -68,8 +72,10 @@ interface WorkContentProps {
   headerY: MotionValue<string>;
   headerOp: MotionValue<number>;
   hoveredIdx: number | null;
-  setHoveredIdx?: (idx: number | null) => void;
   trackRef?: React.RefObject<HTMLDivElement | null>;
+  onCardMouseEnter?: (idx: number, e: React.MouseEvent) => void;
+  onCardMouseMove?: (e: React.MouseEvent) => void;
+  onCardMouseLeave?: () => void;
 }
 
 function WorkContent({
@@ -81,8 +87,10 @@ function WorkContent({
   headerY,
   headerOp,
   hoveredIdx,
-  setHoveredIdx,
   trackRef,
+  onCardMouseEnter,
+  onCardMouseMove,
+  onCardMouseLeave,
 }: WorkContentProps) {
   const isDark = theme === "dark";
 
@@ -160,34 +168,39 @@ function WorkContent({
             return (
               <div
                 key={idx}
-                onMouseEnter={() => setHoveredIdx?.(idx)}
-                onMouseLeave={() => setHoveredIdx?.(null)}
-                className="group flex-none flex flex-col justify-center cursor-pointer"
+                className="group flex-none flex flex-col justify-center cursor-default"
                 style={{ width: `${CARD_W}vw`, maxWidth: "700px" }}
               >
                 {/* Image / Visual */}
                 <div
+                  onMouseEnter={(e) => onCardMouseEnter?.(idx, e)}
+                  onMouseMove={(e) => onCardMouseMove?.(e)}
+                  onMouseLeave={() => onCardMouseLeave?.()}
                   style={{
                     height: "calc(100vh - 290px)",
                     maxHeight: "430px",
-                    borderColor: palette.cardBorder,
+                    borderColor: isHovered ? "rgba(56,189,248,0.35)" : palette.cardBorder,
                     backgroundColor: proj.bg || "#111215",
                   }}
-                  className="w-full overflow-hidden relative border"
+                  className="w-full overflow-hidden relative border cursor-none transition-colors duration-300"
                 >
                   {proj.image ? (
                     <img
                       src={proj.image}
                       alt={`${proj.title} — ${proj.description}`}
                       loading={idx < 2 ? "eager" : "lazy"}
-                      className={`w-full h-full object-cover object-left-top transition-transform duration-700 ease-out ${
-                        isHovered ? "scale-[1.02]" : "scale-100"
+                      className={`w-full h-full object-cover object-left-top transition-all duration-500 ease-out ${
+                        isHovered
+                          ? "scale-[1.04] filter brightness-[0.55] blur-[3px]"
+                          : "scale-100 filter brightness-100 blur-0"
                       }`}
                     />
                   ) : (
                     <div
-                      className={`w-full h-full transition-transform duration-700 ease-out origin-center ${
-                        isHovered ? "scale-[1.02]" : "scale-100"
+                      className={`w-full h-full transition-all duration-500 ease-out origin-center ${
+                        isHovered
+                          ? "scale-[1.04] filter brightness-[0.55] blur-[3px]"
+                          : "scale-100 filter brightness-100 blur-0"
                       }`}
                       style={{
                         background: proj.visual,
@@ -197,6 +210,13 @@ function WorkContent({
                       }}
                     />
                   )}
+
+                  {/* Darkened tint layer inside the hovered picture */}
+                  <div
+                    className={`absolute inset-0 bg-[#06101e]/30 pointer-events-none transition-opacity duration-300 ${
+                      isHovered ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
                 </div>
 
                 {/* Title */}
@@ -217,6 +237,40 @@ function WorkContent({
               </div>
             );
           })}
+
+          {/* ── 5th Item: Full Catalogue CTA Card ────────────────────────────────────── */}
+          <div
+            className="group flex-none flex flex-col justify-center"
+            style={{ width: `${CARD_W}vw`, maxWidth: "700px" }}
+          >
+            <div
+              style={{
+                height: "calc(100vh - 290px)",
+                maxHeight: "430px",
+              }}
+              className="w-full relative flex flex-col items-center justify-center p-8 text-center"
+            >
+              <h3
+                style={{ color: palette.title }}
+                className="font-serif font-semibold text-3xl sm:text-4xl tracking-tight mb-6"
+              >
+                Want to see my full catalogue?
+              </h3>
+              <a
+                href="#contact"
+                className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide transition-all duration-300 shadow-md hover:scale-[1.03] active:scale-[0.98] ${
+                  isDark
+                    ? "bg-sky-400 text-[#0b1c2e] hover:bg-sky-300 shadow-sky-400/20"
+                    : "bg-[#102d4a] text-white hover:bg-[#1b4c78] shadow-[#102d4a]/20"
+                }`}
+              >
+                <span>Click here</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
+            </div>
+            {/* Spacer title/desc for alignment with project cards */}
+            <div className="h-[70px] mt-3.5" />
+          </div>
         </motion.div>
       </div>
 
@@ -248,6 +302,40 @@ export default function WorkSection() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  // Mouse tracking for the view bubble
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth spring physics for floating cursor bubble
+  const springX = useSpring(mouseX, { damping: 28, stiffness: 350 });
+  const springY = useSpring(mouseY, { damping: 28, stiffness: 350 });
+
+  const handleCardMouseEnter = (idx: number, e: React.MouseEvent) => {
+    const rect = e.currentTarget.closest(".sticky")?.getBoundingClientRect();
+    const posX = rect ? e.clientX - rect.left : e.clientX;
+    const posY = rect ? e.clientY - rect.top : e.clientY;
+    mouseX.set(posX);
+    mouseY.set(posY);
+    springX.jump(posX);
+    springY.jump(posY);
+    setHoveredIdx(idx);
+  };
+
+  const handleCardMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.closest(".sticky")?.getBoundingClientRect();
+    if (rect) {
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
+    } else {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    }
+  };
+
+  const handleCardMouseLeave = () => {
+    setHoveredIdx(null);
+  };
 
   const [maxShift, setMaxShift] = useState(() => {
     if (typeof window !== "undefined") {
@@ -297,6 +385,10 @@ export default function WorkSection() {
   const headerY       = useTransform(scrollYProgress, [0, 0.12], ["16px", "0px"]);
   const headerOp      = useTransform(scrollYProgress, [0, 0.10], [0, 1]);
 
+  // "Scroll to start" indicator at start of the work section (fades out as runway moves)
+  const scrollStartOp = useTransform(scrollYProgress, [0, 0.02, 0.12, 0.18], [0.95, 1, 1, 0]);
+  const scrollStartY  = useTransform(scrollYProgress, [0, 0.12, 0.18], ["0px", "0px", "-10px"]);
+
   // ── Bubble trajectory and expansion ─────────────────────────────────
   // A solid blue bubble (#0b1c2e) enters slowly from the bottom-right as we scroll.
   // Starts offscreen and glides in gently after the works smoothly materialize.
@@ -324,6 +416,8 @@ export default function WorkSection() {
 
   const clipPath = useMotionTemplate`circle(${bubbleR}vmax at ${bubbleX}% ${bubbleY}%)`;
 
+  const isCardHovered = hoveredIdx !== null;
+
   return (
     <section id="work" className="relative">
       {/* ── Mobile Layout (Natural Vertical Scroll) ── */}
@@ -337,6 +431,12 @@ export default function WorkSection() {
             <p className="font-sans text-xs sm:text-sm text-[#1b4c78]/70 mt-1.5">
               Selected projects &amp; systems architecture.
             </p>
+            <div className="flex items-center gap-2 mt-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#102d4a]/5 text-[#102d4a] border border-[#102d4a]/10 font-mono text-[11px] font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+                Scroll to start ↓
+              </span>
+            </div>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-widest text-[#1b4c78]/50 pb-0.5">
             01 / Selected
@@ -390,6 +490,20 @@ export default function WorkSection() {
               </div>
             </article>
           ))}
+
+          {/* Mobile Full Catalogue CTA */}
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <h3 className="font-serif font-bold text-2xl text-[#102d4a] tracking-tight mb-4">
+              Want to see my full catalogue?
+            </h3>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#102d4a] text-white font-sans text-xs font-medium tracking-wide shadow-md active:scale-95 transition-transform"
+            >
+              <span>Click here</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -413,7 +527,9 @@ export default function WorkSection() {
               headerY={headerY}
               headerOp={headerOp}
               hoveredIdx={hoveredIdx}
-              setHoveredIdx={setHoveredIdx}
+              onCardMouseEnter={handleCardMouseEnter}
+              onCardMouseMove={handleCardMouseMove}
+              onCardMouseLeave={handleCardMouseLeave}
             />
           </div>
 
@@ -449,6 +565,54 @@ export default function WorkSection() {
               opacity: bubbleBorderOp,
             }}
           />
+
+          {/* ── "Scroll to start" Prompt (visible at start of section, fades as runway moves) ── */}
+          <motion.div
+            style={{ opacity: scrollStartOp, y: scrollStartY }}
+            className="pointer-events-none absolute bottom-14 md:bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0b1c2e]/90 text-[#ddeaf5] backdrop-blur-md border border-sky-400/35 shadow-[0_8px_30px_rgba(4,15,28,0.35)] select-none will-change-transform"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-400" />
+            </span>
+            <span className="font-mono text-xs font-semibold tracking-wider uppercase text-white">
+              Scroll to start
+            </span>
+            <span className="text-sky-300 font-sans text-xs animate-bounce">
+              ↓
+            </span>
+          </motion.div>
+
+          {/* ── Floating Interactive View Bubble at Mouse Coordinates ── */}
+          <AnimatePresence>
+            {isCardHovered && (
+              <motion.div
+                key="hover-view-bubble"
+                initial={{ scale: 0.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.3, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 380 }}
+                style={{
+                  left: springX,
+                  top: springY,
+                  x: "-50%",
+                  y: "-50%",
+                }}
+                className="pointer-events-none absolute z-40 flex items-center justify-center"
+              >
+                {/* Luminous Glow Behind Bubble */}
+                <div className="absolute w-28 h-28 rounded-full bg-sky-400/25 blur-xl pointer-events-none" />
+
+                {/* Main Glassmorphic View Bubble */}
+                <div className="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#0b1c2e]/90 text-white backdrop-blur-xl border border-sky-300/40 shadow-[0_12px_36px_rgba(0,0,0,0.45),0_0_24px_rgba(56,189,248,0.35)]">
+                  <div className="flex items-center gap-1 font-sans text-xs font-semibold tracking-wider uppercase text-sky-100">
+                    <span>View</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-sky-300" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
