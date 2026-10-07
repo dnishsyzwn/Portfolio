@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowUpRight } from "lucide-react";
+import LogoIcon from "@/components/LogoIcon";
 
 // Linear interpolation helper
 function lerp(a: number, b: number, t: number): number {
@@ -223,11 +224,16 @@ export default function Topbar() {
               }
               setIsOpen(false);
             }}
-            style={{ color: "var(--nav-title-color, #0d2744)" }}
-            className="font-mono text-xs sm:text-sm md:text-[15px] font-medium tracking-tight hover:opacity-80 transition-colors drop-shadow-sm select-none"
+            className="flex items-center gap-2 group select-none cursor-pointer"
+            aria-label="Danish Syazwan Portfolio Home"
           >
-            <span>Danish</span>
-            <span className="hidden xs:inline">.Syazwan</span>
+            <LogoIcon className="w-7 h-7 sm:w-8 sm:h-8 transition-transform duration-200 group-hover:scale-105 active:scale-95 drop-shadow-sm shrink-0" />
+            <span
+              style={{ color: "var(--nav-title-color, #0d2744)" }}
+              className="hidden xs:inline font-mono text-xs sm:text-sm md:text-[15px] font-medium tracking-tight hover:opacity-80 transition-colors drop-shadow-sm select-none"
+            >
+              .Syazwan
+            </span>
           </a>
         </div>
 
