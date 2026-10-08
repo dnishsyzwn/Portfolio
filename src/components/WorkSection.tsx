@@ -257,7 +257,7 @@ function WorkContent({
                 Want to see my full catalogue?
               </h3>
               <a
-                href="#contact"
+                href="/catalogue"
                 className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide transition-all duration-300 shadow-md hover:scale-[1.03] active:scale-[0.98] ${
                   isDark
                     ? "bg-sky-400 text-[#0b1c2e] hover:bg-sky-300 shadow-sky-400/20"

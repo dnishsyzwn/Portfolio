@@ -31,6 +31,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", href: "/#top" },
   { id: "work", label: "Projects", href: "/#work" },
+  { id: "catalogue", label: "3D Catalogue", href: "/catalogue" },
   { id: "services", label: "Services", href: "/#services" },
   { id: "stack", label: "Stack", href: "/#stack" },
   { id: "pricing", label: "Pricing", href: "/pricing" },
@@ -207,8 +208,8 @@ export default function Topbar() {
       <div
         onClick={() => setIsOpen(false)}
         aria-hidden="true"
-        className={`fixed inset-0 z-30 bg-black/25 backdrop-blur-[1px] pointer-events-auto transition-opacity duration-200 ease-out ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 z-30 bg-black/25 backdrop-blur-[1px] transition-opacity duration-200 ease-out ${
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       />
 
