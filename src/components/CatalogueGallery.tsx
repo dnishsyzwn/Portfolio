@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowLeft, Sparkles } from "lucide-react";
+import RollingButtonLabel from "@/components/RollingButtonLabel";
+import { lockPageScroll } from "@/lib/scroll-lock";
+import MobileCatalogue from "./MobileCatalogue";
+import styles from "./CatalogueGallery.module.css";
 
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -40,34 +44,30 @@ const CATALOGUE_PROJECTS: CatalogueProject[] = [
     githubUrl: "https://github.com/dnishsyzwn",
   },
   {
-    id: "1tusk-1",
+    id: "autodetail",
     number: "02",
-    title: "1Tusk",
-    category: "Security Operations Platform",
-    year: "2026",
+    title: "AutoDetail",
+    category: "Luxury Car Detailing",
+    year: "",
     description:
-      "An enterprise security operations and workforce management platform featuring real-time guard deployment tracking, incident logging, attendance analytics, and dynamic shift scheduling.",
-    tech: ["React 19", "Node.js", "WebSockets", "Leaflet Geo"],
-    image: "/1tusk.png",
-    bg: "#f8fafc",
+      "A luxury car detailing website with a refined monochrome design, premium service presentation, and a clear booking call to action.",
+    tech: [],
+    image: "/autodetail.png",
+    bg: "#000000",
     side: "right",
-    liveUrl: "https://1tusk.com",
-    githubUrl: "https://github.com/dnishsyzwn",
   },
   {
-    id: "gocarry-1",
+    id: "car-rental",
     number: "03",
-    title: "GoCarry",
-    category: "Logistics & Freight Dispatch",
-    year: "2025",
+    title: "Car Rental",
+    category: "Car Rental & Transport",
+    year: "",
     description:
-      "An on-demand freight logistics and lorry booking platform featuring real-time vehicle tier selection, automated route fare calculation, multi-stop pickup scheduling, and fleet dispatch.",
-    tech: ["Next.js", "Express.js", "PostgreSQL", "Google Maps API"],
-    image: "/gocarry.png",
-    bg: "#ffffff",
+      "A car rental website with a bold black-and-gold design, a prominent vehicle showcase, and clear navigation to services and contact information.",
+    tech: [],
+    image: "/car-rental.png",
+    bg: "#000000",
     side: "left",
-    liveUrl: "https://gocarry.com",
-    githubUrl: "https://github.com/dnishsyzwn",
   },
   {
     id: "stu-1",
@@ -85,23 +85,8 @@ const CATALOGUE_PROJECTS: CatalogueProject[] = [
     githubUrl: "https://github.com/dnishsyzwn",
   },
   {
-    id: "syncuid-2",
+    id: "1tusk-1",
     number: "05",
-    title: "Syncuid",
-    category: "Collaborative Creator Network",
-    year: "2026",
-    description:
-      "A collaborative project discovery network empowering game developers, artists, and creators to showcase builds, recruit contributors, and coordinate cross-disciplinary teams with real-time sync.",
-    tech: ["Next.js 15", "TypeScript", "Tailwind CSS", "Distributed Systems"],
-    image: "/syncuid.png",
-    bg: "#111215",
-    side: "left",
-    liveUrl: "https://syncuid.com",
-    githubUrl: "https://github.com/dnishsyzwn",
-  },
-  {
-    id: "1tusk-2",
-    number: "06",
     title: "1Tusk",
     category: "Security Operations Platform",
     year: "2026",
@@ -110,13 +95,13 @@ const CATALOGUE_PROJECTS: CatalogueProject[] = [
     tech: ["React 19", "Node.js", "WebSockets", "Leaflet Geo"],
     image: "/1tusk.png",
     bg: "#f8fafc",
-    side: "right",
+    side: "left",
     liveUrl: "https://1tusk.com",
     githubUrl: "https://github.com/dnishsyzwn",
   },
   {
-    id: "gocarry-2",
-    number: "07",
+    id: "gocarry-1",
+    number: "06",
     title: "GoCarry",
     category: "Logistics & Freight Dispatch",
     year: "2025",
@@ -125,23 +110,8 @@ const CATALOGUE_PROJECTS: CatalogueProject[] = [
     tech: ["Next.js", "Express.js", "PostgreSQL", "Google Maps API"],
     image: "/gocarry.png",
     bg: "#ffffff",
-    side: "left",
-    liveUrl: "https://gocarry.com",
-    githubUrl: "https://github.com/dnishsyzwn",
-  },
-  {
-    id: "stu-2",
-    number: "08",
-    title: "Sabah Teachers Union",
-    category: "Official Portal & Member Services",
-    year: "2025",
-    description:
-      "The official web portal and digital services platform for Sabah's largest educators' union, featuring online membership registration, welfare claims tracking, news dispatch, and administrative resource management.",
-    tech: ["Next.js", "Tailwind CSS", "PostgreSQL", "Cloudflare"],
-    image: "/stu.png",
-    bg: "#081b2e",
     side: "right",
-    liveUrl: "https://stu.org.my",
+    liveUrl: "https://gocarry.com",
     githubUrl: "https://github.com/dnishsyzwn",
   },
 ];
@@ -150,7 +120,6 @@ const CATALOGUE_PROJECTS: CatalogueProject[] = [
    3D Hallway Layout Specifications
 ───────────────────────────────────────────────────────────────────────── */
 const DEFAULT_HALLWAY_HALF_WIDTH = 1500; // Responsive default distance to side walls
-const HALLWAY_DEPTH = 12500; // Total length of hallway along Z-axis in px (accommodates 8 projects)
 const Z_START = -950; // Z-position of first painting
 const Z_SPACING = 1250; // Z-distance between successive paintings
 
@@ -198,13 +167,25 @@ function getCameraTransform(index: number, halfWidth: number = DEFAULT_HALLWAY_H
 type Phase = "stacking" | "stacked" | "transitioning" | "hallway";
 
 export default function CatalogueGallery() {
+  useEffect(() => lockPageScroll(), []);
   const [phase, setPhase] = useState<Phase>("stacking");
   const [cardsLoaded, setCardsLoaded] = useState(0);
   const [activeStep, setActiveStep] = useState<number>(-1);
   const [isNavigating, setIsNavigating] = useState(false);
+  const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Responsive painting dimensions to fill almost the entire screen on any device
   const [screenSize, setScreenSize] = useState({ width: 1920, height: 1080 });
+  const isMobile = screenSize.width < 768;
+
+  useEffect(() => () => {
+    if (navigationTimer.current !== null) clearTimeout(navigationTimer.current);
+  }, []);
+
+  // A phone opens directly on a project, including after resizing an overview.
+  useEffect(() => {
+    if (isMobile && (phase === "hallway" || phase === "transitioning") && activeStep < 0) setActiveStep(0);
+  }, [isMobile, phase, activeStep]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -236,32 +217,38 @@ export default function CatalogueGallery() {
 
   // Entrance Card Stacking Sequencer
   useEffect(() => {
+    if (phase !== "stacking") return;
     let current = 0;
     const interval = setInterval(() => {
       current++;
-      setCardsLoaded(current);
+      setCardsLoaded(previous => Math.max(previous, current));
       if (current >= CATALOGUE_PROJECTS.length) {
         clearInterval(interval);
-        setTimeout(() => {
-          setPhase("stacked");
-        }, 850); // Generous time for the final card to complete its slow, graceful glide
       }
     }, 220); // 220ms interval: slower, cinematic cadence while maintaining overlapping flow
 
     return () => clearInterval(interval);
-  }, []);
+  }, [phase]);
 
   // Handler to enter the 3D gallery
   const handleStart = useCallback(() => {
-    setPhase("transitioning");
-    setTimeout(() => {
-      setPhase("hallway");
+    setCardsLoaded(CATALOGUE_PROJECTS.length);
+    if (isMobile) setActiveStep(0);
+    setPhase(current => current === "stacking" || current === "stacked" ? "transitioning" : current);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (phase !== "transitioning") return;
+    const timer = setTimeout(() => {
+      setPhase(current => current === "transitioning" ? "hallway" : current);
     }, 1150);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [phase]);
 
   // Keyboard navigation & global shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || (e.target instanceof Element && e.target.closest("header,a,button,input,textarea,select,[contenteditable=true]"))) return;
       if (phase === "stacking" || phase === "stacked") {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -284,20 +271,25 @@ export default function CatalogueGallery() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [phase, activeStep, isNavigating, handleStart]);
+  }, [phase, activeStep, isNavigating, handleStart, isMobile]);
 
   // Navigate through gallery
   const goToStep = useCallback(
     (newStep: number) => {
-      if (isNavigating) return;
       if (newStep < -1 || newStep >= CATALOGUE_PROJECTS.length) return;
+      if (newStep === activeStep) return;
+      if (isMobile) {
+        setActiveStep(newStep);
+        return;
+      }
+      if (isNavigating) return;
       setIsNavigating(true);
       setActiveStep(newStep);
-      setTimeout(() => {
+      navigationTimer.current = setTimeout(() => {
         setIsNavigating(false);
       }, 900);
     },
-    [isNavigating]
+    [isNavigating, activeStep, isMobile]
   );
 
   const goNext = useCallback(() => {
@@ -326,8 +318,15 @@ export default function CatalogueGallery() {
   );
   const activeProject = activeStep >= 0 ? CATALOGUE_PROJECTS[activeStep] : null;
 
+  const restartMobile = () => {
+    if (navigationTimer.current !== null) clearTimeout(navigationTimer.current);
+    setIsNavigating(false);
+    setActiveStep(-1);
+    setPhase("stacked");
+  };
+
   return (
-    <div className="fixed inset-0 z-40 bg-white text-neutral-900 overflow-hidden select-none">
+    <div data-catalogue-phase={phase} className={`${styles.shell} fixed inset-0 z-40 bg-white text-neutral-900 overflow-hidden select-none`}>
       {/* Subtle radial atmosphere */}
       <div
         className="absolute inset-0 pointer-events-none -z-10"
@@ -349,14 +348,14 @@ export default function CatalogueGallery() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className={`absolute inset-0 z-30 flex flex-col items-center justify-center ${
+            className={`${styles.introLayer} absolute inset-0 z-30 flex flex-col items-center justify-center ${
               phase === "transitioning" ? "pointer-events-none" : "pointer-events-auto"
             }`}
           >
             {/* The Stacked Cards Container - Bigger & Bolder */}
             <div
               onClick={handleStart}
-              className="relative w-[380px] sm:w-[480px] md:w-[560px] lg:w-[640px] h-[240px] sm:h-[300px] md:h-[350px] lg:h-[400px] flex items-center justify-center cursor-pointer"
+              className={`${styles.introStack} relative w-[380px] sm:w-[480px] md:w-[560px] lg:w-[640px] h-[240px] sm:h-[300px] md:h-[350px] lg:h-[400px] flex items-center justify-center cursor-pointer`}
             >
               {CATALOGUE_PROJECTS.map((proj, idx) => {
                 if (idx >= cardsLoaded) return null;
@@ -372,7 +371,7 @@ export default function CatalogueGallery() {
                 // When transitioning, burst cards outward to left & right walls
                 const isBursting = phase === "transitioning";
                 const burstTargetX = proj.side === "left" ? "-52vw" : "52vw";
-                const burstTargetY = `${(idx - 3.5) * -7}vh`;
+                const burstTargetY = `${(idx - (CATALOGUE_PROJECTS.length - 1) / 2) * -7}vh`;
 
                 // Converging lateral entry: starts wide from left/right and becomes progressively centered towards the last card
                 const totalProjects = CATALOGUE_PROJECTS.length;
@@ -383,6 +382,11 @@ export default function CatalogueGallery() {
                 return (
                   <motion.div
                     key={proj.id}
+                    onAnimationComplete={() => {
+                      if (idx === CATALOGUE_PROJECTS.length - 1) {
+                        setPhase(current => current === "stacking" ? "stacked" : current);
+                      }
+                    }}
                     initial={{
                       x: startX,
                       y: "52vh",
@@ -427,7 +431,7 @@ export default function CatalogueGallery() {
             </div>
 
             {/* "Click here to start" Button Area */}
-            <div className="h-20 mt-8 flex items-center justify-center relative z-50">
+            <div className={`${styles.startArea} h-20 mt-8 flex items-center justify-center relative z-50`}>
               <AnimatePresence>
                 {(phase === "stacked" || cardsLoaded >= CATALOGUE_PROJECTS.length) && phase !== "transitioning" && (
                   <motion.div
@@ -439,11 +443,9 @@ export default function CatalogueGallery() {
                     <button
                       type="button"
                       onClick={handleStart}
-                      onPointerDown={handleStart}
-                      className="group relative px-9 py-4 rounded-full bg-gradient-to-r from-sky-400 via-sky-300 to-sky-400 text-[#07182b] font-sans text-sm font-semibold tracking-wide shadow-xl shadow-sky-400/35 hover:shadow-sky-400/55 hover:scale-[1.04] active:scale-[0.97] transition-all duration-200 cursor-pointer flex items-center gap-2 select-none border border-sky-200/70 pointer-events-auto"
+                      className="group/roll relative px-9 py-4 rounded-full bg-gradient-to-r from-sky-400 via-sky-300 to-sky-400 text-[#07182b] font-sans text-sm font-semibold tracking-wide shadow-xl shadow-sky-400/35 hover:shadow-sky-400/55 hover:scale-[1.04] active:scale-[0.97] transition-all duration-200 cursor-pointer flex items-center gap-2 select-none border border-sky-200/70 pointer-events-auto"
                     >
-                      <span>Click here to start</span>
-                      <Sparkles className="w-4 h-4 text-[#07182b] group-hover:rotate-12 transition-transform duration-300" />
+                      <RollingButtonLabel text="Click here to start" icon={<Sparkles className="w-4 h-4" />} />
                     </button>
                   </motion.div>
                 )}
@@ -455,7 +457,7 @@ export default function CatalogueGallery() {
               initial={{ opacity: 0 }}
               animate={{ opacity: phase === "stacked" ? 0.75 : 0 }}
               transition={{ duration: 0.5 }}
-              className="font-mono text-[11px] text-sky-700/80 uppercase tracking-widest text-center mt-2 pointer-events-none"
+              className={`${styles.instruction} font-mono text-[11px] text-sky-700/80 uppercase tracking-widest text-center mt-2 pointer-events-none`}
             >
               Interactive 3D Exhibition
             </motion.p>
@@ -467,7 +469,10 @@ export default function CatalogueGallery() {
           LAYER 2: THE 3D MUSEUM HALLWAY (Reveals when entering/hallway)
          ═════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {(phase === "transitioning" || phase === "hallway") && (
+        {isMobile && (phase === "transitioning" || phase === "hallway") ? (
+          <MobileCatalogue key="mobile-gallery" projects={CATALOGUE_PROJECTS} selected={Math.max(0, activeStep)} entering={phase === "transitioning"}
+            onSelect={goToStep} onRestart={restartMobile} />
+        ) : (phase === "transitioning" || phase === "hallway") && (
           <motion.div
             key="3d-gallery-layer"
             initial={{ opacity: 0 }}
@@ -571,7 +576,7 @@ export default function CatalogueGallery() {
           LAYER 3: HEADS-UP DISPLAY (HUD)
          ═════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {(phase === "hallway" || phase === "transitioning") && (
+        {!isMobile && (phase === "hallway" || phase === "transitioning") && (
           <motion.div
             key="hud-overlay"
             initial={{ opacity: 0 }}

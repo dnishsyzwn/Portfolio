@@ -1,0 +1,31 @@
+@media (max-width: 767px) {
+  .mobileTypography .headline {
+    font-size: clamp(28px, 7.5vw, 42px);
+    line-height: 1.16;
+    letter-spacing: -.035em;
+    margin-bottom: 24px;
+  }
+
+  .headline :global(.glass-line) {
+    white-space: normal;
+    text-wrap: balance;
+    color: #1f4a74;
+    -webkit-text-fill-color: currentColor;
+    background: none;
+    filter: none;
+  }
+
+  .headline :global(.glass-line)::after { display: none; }
+
+  .mobileTypography .intro {
+    max-width: 36ch;
+    font-size: 15px;
+    line-height: 1.75;
+    letter-spacing: 0;
+    margin-bottom: 24px;
+    opacity: 1;
+  }
+
+  .mobileTypography .actions { font-size: 14px; gap: 12px; }
+  .actions a { min-height: 44px; }
+}

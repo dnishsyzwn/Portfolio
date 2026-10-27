@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { lockPageScroll } from "@/lib/scroll-lock";
 
 export default function Preloader() {
   const [shouldShow, setShouldShow] = useState(false);
@@ -9,15 +10,23 @@ export default function Preloader() {
   const [isDone, setIsDone] = useState(false);
 
   useEffect(() => {
+    // Skip the intro for direct catalogue visits and reduced-motion preferences.
+    if (window.location.pathname === "/catalogue" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsDone(true);
+      return;
+    }
     // Only run the preloader once per session visit
-    const hasSeen = sessionStorage.getItem("portfolio_has_seen_preloader");
+    let hasSeen = false;
+    try { hasSeen = Boolean(sessionStorage.getItem("portfolio_has_seen_preloader")); } catch { /* Storage may be unavailable in private browsing. */ }
     if (hasSeen) {
       setIsDone(true);
       return;
     }
 
     setShouldShow(true);
-    document.body.style.overflow = "hidden";
+    const releaseScroll = lockPageScroll();
+    let frameId: number;
+    let finishTimer: ReturnType<typeof setTimeout> | undefined;
 
     const duration = 1400; // 1.4 seconds - snappy, minimalist
     const startTime = performance.now();
@@ -29,21 +38,22 @@ export default function Preloader() {
       setProgress(current);
 
       if (rawProgress < 1) {
-        requestAnimationFrame(updateCounter);
+        frameId = requestAnimationFrame(updateCounter);
       } else {
-        setTimeout(() => {
+        finishTimer = setTimeout(() => {
           setIsDone(true);
-          sessionStorage.setItem("portfolio_has_seen_preloader", "true");
-          document.body.style.overflow = "";
+          try { sessionStorage.setItem("portfolio_has_seen_preloader", "true"); } catch { /* The animation still completes without storage. */ }
+          releaseScroll();
         }, 220);
       }
     };
 
-    const frameId = requestAnimationFrame(updateCounter);
+    frameId = requestAnimationFrame(updateCounter);
 
     return () => {
       cancelAnimationFrame(frameId);
-      document.body.style.overflow = "";
+      if (finishTimer !== undefined) clearTimeout(finishTimer);
+      releaseScroll();
     };
   }, []);
 

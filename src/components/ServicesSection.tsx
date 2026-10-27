@@ -1,6 +1,7 @@
 "use client";
 
 import RollingButtonLabel from "@/components/RollingButtonLabel";
+import { SHOW_PRICING_LINKS } from "@/config/navigation";
 
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motion";
@@ -217,12 +218,12 @@ export default function ServicesSection() {
             A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
           </p>
           <div className="flex flex-col sm:flex-row items-start gap-3">
-            <a
+            {SHOW_PRICING_LINKS && <a
               href="/pricing"
               className="group/roll group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full w-fit self-start bg-[#38bdf8] hover:bg-[#a4cff0] text-[#0b1c2e] font-sans text-sm sm:text-base font-semibold transition-all shadow-[0_4px_20px_rgba(56,189,248,0.3)] hover:-translate-y-0.5 active:translate-y-0"
             >
               <RollingButtonLabel text="View Pricing &amp; Plans" />
-            </a>
+            </a>}
 
             <a
               href="/contact"
@@ -329,12 +330,12 @@ export default function ServicesSection() {
                 A comprehensive suite of engineering services to take your product from architectural blueprint to production-grade deployment.
               </p>
               <div className="flex flex-col items-start gap-2.5">
-                <a
+                {SHOW_PRICING_LINKS && <a
                   href="/pricing"
                   className="group/roll group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full w-fit self-start bg-[#38bdf8] hover:bg-[#a4cff0] text-[#0b1c2e] font-sans text-[13.5px] sm:text-[14.5px] font-semibold tracking-wide transition-all duration-300 shadow-[0_4px_20px_rgba(56,189,248,0.3)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.45)] hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <RollingButtonLabel text="View Pricing &amp; Plans" />
-                </a>
+                </a>}
 
                 <a
                   href="/contact"

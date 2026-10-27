@@ -1,12 +1,15 @@
 "use client";
 
 import RollingButtonLabel from "@/components/RollingButtonLabel";
+import { SHOW_PRICING_LINKS } from "@/config/navigation";
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Github, Linkedin, ArrowUpRight } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-80px" });
 
@@ -16,6 +19,8 @@ export default function Footer() {
   ];
 
   let cumulativeCharIdx = 0;
+
+  if (pathname === "/catalogue") return null;
 
   return (
     <footer id="contact" className="relative py-14 sm:py-20 px-5 sm:px-8 md:px-12 border-t border-[#1b4c78]/10 bg-white">
@@ -149,14 +154,14 @@ export default function Footer() {
                 Technical Arsenal
               </a>
             </div>
-            <div>
+            {SHOW_PRICING_LINKS && <div>
               <a
                 href="/pricing"
                 className="text-[#1b4c78] hover:text-sky transition-colors"
               >
                 My Pricing
               </a>
-            </div>
+            </div>}
           </div>
 
           {/* Col 3: Socials */}

@@ -1,7 +1,8 @@
 import { ArrowUpRight } from "lucide-react";
+import type { ReactNode } from "react";
 
-function RollingGlyph({ character, index, active }: { character: string | null; index: number; active?: boolean }) {
-  const content = character === null ? <ArrowUpRight className="h-4 w-4" /> : character;
+function RollingGlyph({ character, index, active, icon }: { character: string | null; index: number; active?: boolean; icon?: ReactNode }) {
+  const content = character === null ? icon ?? <ArrowUpRight className="h-4 w-4" /> : character;
   return (
     <span className="relative inline-block overflow-hidden align-bottom leading-[1.4] [perspective:200px]">
       <span
@@ -16,7 +17,7 @@ function RollingGlyph({ character, index, active }: { character: string | null; 
   );
 }
 
-export default function RollingButtonLabel({ text, active }: { text: string; active?: boolean }) {
+export default function RollingButtonLabel({ text, active, icon }: { text: string; active?: boolean; icon?: ReactNode }) {
   let offset = 0;
   return (
     <span className="inline-block text-center">
@@ -34,7 +35,7 @@ export default function RollingButtonLabel({ text, active }: { text: string; act
             </span>
           );
         })}
-        <span className="ml-2 inline-block"><RollingGlyph character={null} index={text.length} active={active} /></span>
+        <span className="ml-2 inline-block"><RollingGlyph character={null} index={text.length} active={active} icon={icon} /></span>
       </span>
     </span>
   );

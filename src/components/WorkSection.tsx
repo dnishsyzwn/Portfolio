@@ -6,13 +6,9 @@ import {
   useScroll,
   useTransform,
   useMotionTemplate,
-  useMotionValue,
-  useSpring,
   useReducedMotion,
-  AnimatePresence,
   MotionValue,
 } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
 import RollingButtonLabel from "@/components/RollingButtonLabel";
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -37,18 +33,18 @@ const projects: ProjectItem[] = [
     bg: "#111215",
   },
   {
-    title: "1Tusk",
+    title: "AutoDetail",
     description:
-      "An enterprise security operations and workforce management platform featuring real-time guard deployment tracking, incident logging, attendance analytics, and shift scheduling.",
-    image: "/1tusk.png",
-    bg: "#f8fafc",
+      "A luxury car detailing website with a refined monochrome design, premium service presentation, and a clear booking call to action.",
+    image: "/autodetail.png",
+    bg: "#000000",
   },
   {
-    title: "GoCarry",
+    title: "Car Rental",
     description:
-      "An on-demand freight logistics and lorry booking platform featuring real-time vehicle tier selection, automated route fare calculation, multi-stop pickup scheduling, and fleet dispatch.",
-    image: "/gocarry.png",
-    bg: "#ffffff",
+      "A car rental website with a bold black-and-gold design, a prominent vehicle showcase, and clear navigation to services and contact information.",
+    image: "/car-rental.png",
+    bg: "#000000",
   },
   {
     title: "Sabah Teachers Union (STU)",
@@ -73,13 +69,9 @@ interface WorkContentProps {
   progressWidth: MotionValue<string>;
   headerY: MotionValue<string>;
   headerOp: MotionValue<number>;
-  hoveredIdx: number | null;
   catalogueActive: boolean;
   onCatalogueActive: (active: boolean) => void;
   trackRef?: React.RefObject<HTMLDivElement | null>;
-  onCardMouseEnter?: (idx: number, e: React.MouseEvent) => void;
-  onCardMouseMove?: (e: React.MouseEvent) => void;
-  onCardMouseLeave?: () => void;
 }
 
 function WorkContent({
@@ -90,13 +82,9 @@ function WorkContent({
   progressWidth,
   headerY,
   headerOp,
-  hoveredIdx,
   catalogueActive,
   onCatalogueActive,
   trackRef,
-  onCardMouseEnter,
-  onCardMouseMove,
-  onCardMouseLeave,
 }: WorkContentProps) {
   const isDark = theme === "dark";
 
@@ -170,7 +158,6 @@ function WorkContent({
           className="flex will-change-transform"
         >
           {projects.map((proj, idx) => {
-            const isHovered = hoveredIdx === idx;
             return (
               <div
                 key={idx}
@@ -179,35 +166,24 @@ function WorkContent({
               >
                 {/* Image / Visual */}
                 <div
-                  onMouseEnter={(e) => onCardMouseEnter?.(idx, e)}
-                  onMouseMove={(e) => onCardMouseMove?.(e)}
-                  onMouseLeave={() => onCardMouseLeave?.()}
                   style={{
                     height: "calc(100vh - 290px)",
                     maxHeight: "430px",
-                    borderColor: isHovered ? "rgba(56,189,248,0.35)" : palette.cardBorder,
+                    borderColor: palette.cardBorder,
                     backgroundColor: proj.bg || "#111215",
                   }}
-                  className="w-full overflow-hidden relative border cursor-none transition-colors duration-300"
+                  className="w-full overflow-hidden relative border cursor-default"
                 >
                   {proj.image ? (
                     <img
                       src={proj.image}
                       alt={`${proj.title} — ${proj.description}`}
                       loading={idx < 2 ? "eager" : "lazy"}
-                      className={`w-full h-full object-cover object-left-top transition-all duration-500 ease-out ${
-                        isHovered
-                          ? "scale-[1.04] filter brightness-[0.55] blur-[3px]"
-                          : "scale-100 filter brightness-100 blur-0"
-                      }`}
+                      className="w-full h-full object-cover object-left-top"
                     />
                   ) : (
                     <div
-                      className={`w-full h-full transition-all duration-500 ease-out origin-center ${
-                        isHovered
-                          ? "scale-[1.04] filter brightness-[0.55] blur-[3px]"
-                          : "scale-100 filter brightness-100 blur-0"
-                      }`}
+                      className="w-full h-full"
                       style={{
                         background: proj.visual,
                         backgroundImage: [proj.overlay, proj.visual].join(", "),
@@ -217,12 +193,7 @@ function WorkContent({
                     />
                   )}
 
-                  {/* Darkened tint layer inside the hovered picture */}
-                  <div
-                    className={`absolute inset-0 bg-[#06101e]/30 pointer-events-none transition-opacity duration-300 ${
-                      isHovered ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
+
                 </div>
 
                 {/* Title */}
@@ -313,42 +284,6 @@ export default function WorkSection() {
   const [catalogueActive, setCatalogueActive] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
-  // Mouse tracking for the view bubble
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth spring physics for floating cursor bubble
-  const springX = useSpring(mouseX, { damping: 28, stiffness: 350 });
-  const springY = useSpring(mouseY, { damping: 28, stiffness: 350 });
-
-  const handleCardMouseEnter = (idx: number, e: React.MouseEvent) => {
-    const rect = e.currentTarget.closest(".sticky")?.getBoundingClientRect();
-    const posX = rect ? e.clientX - rect.left : e.clientX;
-    const posY = rect ? e.clientY - rect.top : e.clientY;
-    mouseX.set(posX);
-    mouseY.set(posY);
-    springX.jump(posX);
-    springY.jump(posY);
-    setHoveredIdx(idx);
-  };
-
-  const handleCardMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.closest(".sticky")?.getBoundingClientRect();
-    if (rect) {
-      mouseX.set(e.clientX - rect.left);
-      mouseY.set(e.clientY - rect.top);
-    } else {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    }
-  };
-
-  const handleCardMouseLeave = () => {
-    setHoveredIdx(null);
-  };
-
   const [maxShift, setMaxShift] = useState(() => {
     if (typeof window !== "undefined") {
       const vw = window.innerWidth;
@@ -428,7 +363,6 @@ export default function WorkSection() {
 
   const clipPath = useMotionTemplate`circle(${bubbleR}vmax at ${bubbleX}% ${bubbleY}%)`;
 
-  const isCardHovered = hoveredIdx !== null;
 
   return (
     <section id="work" className="relative">
@@ -462,7 +396,7 @@ export default function WorkSection() {
                 delay: reduceMotion ? 0 : idx * 0.1,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="relative isolate flex aspect-[16/11] min-h-[250px] flex-col justify-end overflow-hidden rounded-[10px] bg-[#102d4a] p-3 text-white shadow-[0_8px_32px_rgba(16,45,74,0.12)]"
+              className="relative isolate flex aspect-[16/11] min-h-[250px] flex-col justify-end overflow-hidden rounded-[4px] bg-[#102d4a] p-3 text-white shadow-[0_8px_32px_rgba(16,45,74,0.12)]"
             >
               {/* Project Screenshot / Visual */}
               <div
@@ -499,15 +433,7 @@ export default function WorkSection() {
                   </h3>
                 </div>
               </div>
-              <a
-                href={["https://syncuid.com", "https://1tusk.com", "https://gocarry.com", "https://stu.org.my"][idx]}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Visit ${proj.title} (opens in a new tab)`}
-                className="group/roll flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 font-sans text-xs font-medium text-[#102d4a] transition-colors hover:bg-[#edf6ff] active:bg-[#dcecf8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                <RollingButtonLabel text="View project" />
-              </a>
+
             </motion.article>
           ))}
 
@@ -547,10 +473,6 @@ export default function WorkSection() {
               progressWidth={progressWidth}
               headerY={headerY}
               headerOp={headerOp}
-              hoveredIdx={hoveredIdx}
-              onCardMouseEnter={handleCardMouseEnter}
-              onCardMouseMove={handleCardMouseMove}
-              onCardMouseLeave={handleCardMouseLeave}
             />
           </div>
 
@@ -570,7 +492,6 @@ export default function WorkSection() {
               progressWidth={progressWidth}
               headerY={headerY}
               headerOp={headerOp}
-              hoveredIdx={hoveredIdx}
             />
           </motion.div>
 
@@ -606,36 +527,7 @@ export default function WorkSection() {
             </span>
           </motion.div>
 
-          {/* ── Floating Interactive View Bubble at Mouse Coordinates ── */}
-          <AnimatePresence>
-            {isCardHovered && (
-              <motion.div
-                key="hover-view-bubble"
-                initial={{ scale: 0.2, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.3, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 380 }}
-                style={{
-                  left: springX,
-                  top: springY,
-                  x: "-50%",
-                  y: "-50%",
-                }}
-                className="pointer-events-none absolute z-40 flex items-center justify-center"
-              >
-                {/* Luminous Glow Behind Bubble */}
-                <div className="absolute w-28 h-28 rounded-full bg-sky-400/25 blur-xl pointer-events-none" />
 
-                {/* Main Glassmorphic View Bubble */}
-                <div className="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#0b1c2e]/90 text-white backdrop-blur-xl border border-sky-300/40 shadow-[0_12px_36px_rgba(0,0,0,0.45),0_0_24px_rgba(56,189,248,0.35)]">
-                  <div className="flex items-center gap-1 font-sans text-xs font-semibold tracking-wider uppercase text-sky-100">
-                    <span>View</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-sky-300" />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </section>
