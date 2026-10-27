@@ -8,10 +8,12 @@ import {
   useMotionTemplate,
   useMotionValue,
   useSpring,
+  useReducedMotion,
   AnimatePresence,
   MotionValue,
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import RollingButtonLabel from "@/components/RollingButtonLabel";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Each project: label (small mono caps), an image/visual, and a serif title.
@@ -72,6 +74,8 @@ interface WorkContentProps {
   headerY: MotionValue<string>;
   headerOp: MotionValue<number>;
   hoveredIdx: number | null;
+  catalogueActive: boolean;
+  onCatalogueActive: (active: boolean) => void;
   trackRef?: React.RefObject<HTMLDivElement | null>;
   onCardMouseEnter?: (idx: number, e: React.MouseEvent) => void;
   onCardMouseMove?: (e: React.MouseEvent) => void;
@@ -87,6 +91,8 @@ function WorkContent({
   headerY,
   headerOp,
   hoveredIdx,
+  catalogueActive,
+  onCatalogueActive,
   trackRef,
   onCardMouseEnter,
   onCardMouseMove,
@@ -258,14 +264,18 @@ function WorkContent({
               </h3>
               <a
                 href="/catalogue"
-                className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide transition-all duration-300 shadow-md hover:scale-[1.03] active:scale-[0.98] ${
+                onMouseEnter={() => onCatalogueActive(true)}
+                onMouseLeave={() => onCatalogueActive(false)}
+                onFocus={() => onCatalogueActive(true)}
+                onBlur={() => onCatalogueActive(false)}
+                style={{ backgroundColor: catalogueActive ? (isDark ? "#a4cff0" : "#2e5189") : undefined }}
+                className={`group/roll inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide transition-colors duration-300 shadow-md active:scale-[0.98] ${
                   isDark
-                    ? "bg-sky-400 text-[#0b1c2e] hover:bg-sky-300 shadow-sky-400/20"
-                    : "bg-[#102d4a] text-white hover:bg-[#1b4c78] shadow-[#102d4a]/20"
+                    ? "bg-sky-400 text-[#0b1c2e] hover:bg-[#a4cff0] focus-visible:bg-[#a4cff0] shadow-sky-400/20"
+                    : "bg-[#102d4a] text-white hover:bg-[#2e5189] focus-visible:bg-[#2e5189] shadow-[#102d4a]/20"
                 }`}
               >
-                <span>Click here</span>
-                <ArrowUpRight className="w-4 h-4" />
+                <RollingButtonLabel text="Click here" active={catalogueActive} />
               </a>
             </div>
             {/* Spacer title/desc for alignment with project cards */}
@@ -299,6 +309,8 @@ function WorkContent({
 }
 
 export default function WorkSection() {
+  const reduceMotion = useReducedMotion();
+  const [catalogueActive, setCatalogueActive] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -421,7 +433,7 @@ export default function WorkSection() {
   return (
     <section id="work" className="relative">
       {/* ── Mobile Layout (Natural Vertical Scroll) ── */}
-      <div className="block md:hidden bg-white text-[#102d4a] py-14 border-t border-[#1b4c78]/10">
+      <div className="block md:hidden bg-[#eef1f3] text-[#102d4a] py-14 border-t border-[#1b4c78]/10">
         {/* Mobile Header */}
         <div className="px-6 sm:px-8 pb-6 border-b border-[#1b4c78]/10 flex items-end justify-between">
           <div>
@@ -431,12 +443,6 @@ export default function WorkSection() {
             <p className="font-sans text-xs sm:text-sm text-[#1b4c78]/70 mt-1.5">
               Selected projects &amp; systems architecture.
             </p>
-            <div className="flex items-center gap-2 mt-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#102d4a]/5 text-[#102d4a] border border-[#102d4a]/10 font-mono text-[11px] font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-                Scroll to start ↓
-              </span>
-            </div>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-widest text-[#1b4c78]/50 pb-0.5">
             01 / Selected
@@ -444,15 +450,23 @@ export default function WorkSection() {
         </div>
 
         {/* Mobile Project Cards List */}
-        <div className="px-5 sm:px-8 pt-8 flex flex-col gap-8">
+        <div className="px-4 sm:px-8 pt-8 flex flex-col gap-6">
           {projects.map((proj, idx) => (
-            <article
+            <motion.article
               key={idx}
-              className="flex flex-col rounded-2xl overflow-hidden border border-[#1b4c78]/15 bg-white shadow-[0_10px_30px_-5px_rgba(27,76,120,0.1)]"
+              initial={{ opacity: 0, y: reduceMotion ? 0 : 24, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.95,
+                delay: reduceMotion ? 0 : idx * 0.1,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="relative isolate flex aspect-[16/11] min-h-[250px] flex-col justify-end overflow-hidden rounded-[10px] bg-[#102d4a] p-3 text-white shadow-[0_8px_32px_rgba(16,45,74,0.12)]"
             >
               {/* Project Screenshot / Visual */}
               <div
-                className="w-full aspect-[16/10] relative overflow-hidden bg-[#111215] border-b border-[#1b4c78]/10"
+                className="absolute inset-0 -z-20 overflow-hidden bg-[#111215]"
                 style={{ backgroundColor: proj.bg || "#111215" }}
               >
                 {proj.image ? (
@@ -473,22 +487,28 @@ export default function WorkSection() {
                     }}
                   />
                 )}
-                {/* Index Pill */}
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/65 backdrop-blur-md border border-white/20 font-mono text-[10px] font-semibold text-white tracking-wider">
-                  0{idx + 1}
-                </div>
               </div>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[65%] bg-gradient-to-t from-[#07121e]/75 via-[#07121e]/25 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[45%] [mask-image:linear-gradient(to_top,black_50%,transparent)] backdrop-blur-sm" />
 
               {/* Title & Description */}
-              <div className="p-5 sm:p-6 flex flex-col gap-2">
-                <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#102d4a] tracking-tight leading-snug">
-                  {proj.title}
-                </h3>
-                <p className="font-sans text-xs sm:text-sm text-[#1e3d5f]/85 leading-relaxed">
-                  {proj.description}
-                </p>
+              <div className="px-1 pt-12 pb-3 sm:px-3 flex flex-col gap-1.5">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-sans font-semibold text-base sm:text-xl text-white tracking-tight leading-snug">
+                    {proj.title}
+                  </h3>
+                </div>
               </div>
-            </article>
+              <a
+                href={["https://syncuid.com", "https://1tusk.com", "https://gocarry.com", "https://stu.org.my"][idx]}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visit ${proj.title} (opens in a new tab)`}
+                className="group/roll flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 font-sans text-xs font-medium text-[#102d4a] transition-colors hover:bg-[#edf6ff] active:bg-[#dcecf8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <RollingButtonLabel text="View project" />
+              </a>
+            </motion.article>
           ))}
 
           {/* Mobile Full Catalogue CTA */}
@@ -497,11 +517,10 @@ export default function WorkSection() {
               Want to see my full catalogue?
             </h3>
             <a
-              href="#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#102d4a] text-white font-sans text-xs font-medium tracking-wide shadow-md active:scale-95 transition-transform"
+              href="/catalogue"
+              className="group/roll inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#102d4a] hover:bg-[#2e5189] focus-visible:bg-[#2e5189] text-white font-sans text-xs font-medium tracking-wide shadow-md active:scale-95 transition-colors duration-300"
             >
-              <span>Click here</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <RollingButtonLabel text="Click here" />
             </a>
           </div>
         </div>
@@ -519,6 +538,8 @@ export default function WorkSection() {
           <div className="absolute inset-0">
             <WorkContent
               theme="light"
+              catalogueActive={catalogueActive}
+              onCatalogueActive={setCatalogueActive}
               trackRef={trackRef}
               x={x}
               trackOp={trackOp}
@@ -541,6 +562,8 @@ export default function WorkSection() {
           >
             <WorkContent
               theme="dark"
+              catalogueActive={catalogueActive}
+              onCatalogueActive={setCatalogueActive}
               x={x}
               trackOp={trackOp}
               trackY={trackY}

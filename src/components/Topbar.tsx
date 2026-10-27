@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 import LogoIcon from "@/components/LogoIcon";
 
@@ -39,6 +40,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export default function Topbar() {
+  const pathname = usePathname();
   const headerRef = useRef<HTMLElement | null>(null);
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -78,50 +80,54 @@ export default function Topbar() {
 
         let darkness = 0;
 
-        const hero = document.getElementById("hero") || document.getElementById("top");
-        const work = document.getElementById("work");
-        const services = document.getElementById("services") || document.getElementById("curriculum");
-        const stack = document.getElementById("stack");
+        if (pathname === "/catalogue" || pathname === "/pricing" || pathname === "/contact") {
+          darkness = 1;
+        } else {
+          const hero = document.getElementById("hero") || document.getElementById("top");
+          const work = document.getElementById("work");
+          const services = document.getElementById("services") || document.getElementById("curriculum");
+          const stack = document.getElementById("stack");
 
-        // 1. Hero Section: SilkHero is light ice-blue/white, darkness = 0
-        if (hero) {
-          const heroRect = hero.getBoundingClientRect();
-          if (heroRect.top <= 0 && heroRect.bottom > 80) {
-            darkness = 0;
-          }
-        }
-
-        // 2. Work section
-        if (work) {
-          const rect = work.getBoundingClientRect();
-          if (rect.top <= 0 && rect.bottom > 0) {
-            const scrollableDist = rect.height - window.innerHeight;
-            if (scrollableDist > 0) {
-              const progress = Math.min(1, Math.max(0, -rect.top / scrollableDist));
-              if (progress < 0.35) darkness = 0;
-              else if (progress <= 0.75) darkness = (progress - 0.35) / 0.4;
-              else darkness = 1;
+          // 1. Hero Section: SilkHero is light ice-blue/white, darkness = 0
+          if (hero) {
+            const heroRect = hero.getBoundingClientRect();
+            if (heroRect.top <= 0 && heroRect.bottom > 80) {
+              darkness = 0;
             }
           }
-        }
 
-        // 3. Services section
-        if (services) {
-          const cRect = services.getBoundingClientRect();
-          if (cRect.top <= 60 && cRect.bottom > 0) {
-            darkness = 1;
+          // 2. Work section
+          if (work) {
+            const rect = work.getBoundingClientRect();
+            if (rect.top <= 0 && rect.bottom > 0) {
+              const scrollableDist = rect.height - window.innerHeight;
+              if (scrollableDist > 0) {
+                const progress = Math.min(1, Math.max(0, -rect.top / scrollableDist));
+                if (progress < 0.35) darkness = 0;
+                else if (progress <= 0.75) darkness = (progress - 0.35) / 0.4;
+                else darkness = 1;
+              }
+            }
           }
-        }
 
-        // 4. Stack section
-        if (stack) {
-          const sRect = stack.getBoundingClientRect();
-          if (sRect.top <= 60 && sRect.bottom > 0) {
-            if (sRect.bottom <= 120) {
-              const exitRatio = Math.max(0, (sRect.bottom - 20) / 100);
-              darkness = Math.max(darkness, exitRatio);
-            } else {
+          // 3. Services section
+          if (services) {
+            const cRect = services.getBoundingClientRect();
+            if (cRect.top <= 60 && cRect.bottom > 0) {
               darkness = 1;
+            }
+          }
+
+          // 4. Stack section
+          if (stack) {
+            const sRect = stack.getBoundingClientRect();
+            if (sRect.top <= 60 && sRect.bottom > 0) {
+              if (sRect.bottom <= 120) {
+                const exitRatio = Math.max(0, (sRect.bottom - 20) / 100);
+                darkness = Math.max(darkness, exitRatio);
+              } else {
+                darkness = 1;
+              }
             }
           }
         }
@@ -147,7 +153,7 @@ export default function Topbar() {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [pathname]);
 
   // Close on outside click or Escape key
   useEffect(() => {
@@ -192,7 +198,7 @@ export default function Topbar() {
     }
   }, []);
 
-  const isMobile = windowWidth < 640;
+  const isMobile = windowWidth < 768;
   // Constant width matching the card
   const menuWidth = isMobile ? Math.min(310, windowWidth - 32) : 310;
 
@@ -241,15 +247,14 @@ export default function Topbar() {
         {/* Center: GPU-Accelerated Straight-Down Accordion Menu */}
         <div
           ref={menuContainerRef}
-          style={{ width: menuWidth }}
-          className="flex-none relative flex justify-center h-[42px] z-40"
+          className="flex-none relative flex justify-center h-[42px] w-11 md:w-[310px] z-40"
         >
           <div
             style={{
               position: "absolute",
               top: 0,
-              left: 0,
-              width: "100%",
+              right: 0,
+              width: isMobile && isOpen ? menuWidth : "100%",
               height: isOpen ? `${openHeight}px` : "42px",
               backgroundColor: isOpen
                 ? "#0b1c2e"
@@ -280,10 +285,10 @@ export default function Topbar() {
               onClick={() => setIsOpen((prev) => !prev)}
               aria-expanded={isOpen}
               aria-label={isOpen ? "Close menu" : "Open menu"}
-              className="w-full h-[42px] px-5 sm:px-6 flex items-center justify-between cursor-pointer focus:outline-none transition-colors"
+              className={`w-full h-[42px] flex items-center cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-sky-400 transition-colors ${isMobile && !isOpen ? "justify-center" : "px-5 sm:px-6 justify-between"}`}
             >
               <span
-                className={`font-sans text-[13px] sm:text-[14px] font-medium tracking-tight transition-colors duration-200 ${
+                className={`${isMobile && !isOpen ? "hidden" : ""} font-sans text-[13px] sm:text-[14px] font-medium tracking-tight transition-colors duration-200 ${
                   isOpen
                     ? "text-[#ddeaf5]"
                     : darknessRatio > 0.5
@@ -325,6 +330,8 @@ export default function Topbar() {
             {/* Expanded Content: Hardware-accelerated reveal */}
             <div
               ref={contentRef}
+              inert={!isOpen}
+              style={{ width: menuWidth, maxHeight: "calc(100dvh - 110px)", overflowY: "auto" }}
               className={`transition-opacity duration-200 border-t border-[#1e456d]/50 ${
                 isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
               }`}
@@ -386,7 +393,7 @@ export default function Topbar() {
         </div>
 
         {/* Right: Let's Talk CTA */}
-        <div className="flex-1 flex items-center justify-end z-40">
+        <div className="hidden md:flex flex-1 items-center justify-end z-40">
           <a
             href="/contact"
             onClick={() => setIsOpen(false)}

@@ -1,9 +1,11 @@
 "use client";
 
+import RollingButtonLabel from "@/components/RollingButtonLabel";
+
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, HelpCircle, ChevronDown } from "lucide-react";
+import { ArrowLeft, HelpCircle, ChevronDown } from "lucide-react";
 import PricingCard, { PricingCardData } from "@/components/PricingCard";
 
 interface PricingPlanConfig {
@@ -220,10 +222,9 @@ export default function PricingPage() {
 
           <Link
             href="/contact?plan=Custom+Architecture"
-            className="group shrink-0 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#38bdf8] hover:bg-[#60cdff] text-[#0b1c2e] font-sans text-sm sm:text-base font-semibold tracking-wide transition-all shadow-[0_4px_25px_rgba(56,189,248,0.3)] hover:shadow-[0_4px_30px_rgba(56,189,248,0.5)] hover:-translate-y-0.5 active:translate-y-0"
+            className="group/roll group shrink-0 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#38bdf8] hover:bg-[#a4cff0] text-[#0b1c2e] font-sans text-sm sm:text-base font-semibold tracking-wide transition-all shadow-[0_4px_25px_rgba(56,189,248,0.3)] hover:shadow-[0_4px_30px_rgba(56,189,248,0.5)] hover:-translate-y-0.5 active:translate-y-0"
           >
-            <span>Discuss Custom Scope</span>
-            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <RollingButtonLabel text="Discuss Custom Scope" />
           </Link>
         </motion.div>
 

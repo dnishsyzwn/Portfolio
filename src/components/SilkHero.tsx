@@ -111,6 +111,9 @@ export default function SilkHero() {
       const isMob = window.innerWidth < 768;
       setIsMobile(isMob);
       buildGradients(width, height, isMob);
+      // Resizing clears an opaque canvas to black, even while animation is paused.
+      ctx.fillStyle = baseGrad;
+      ctx.fillRect(0, 0, width, height);
     };
     handleResize();
 
@@ -140,7 +143,7 @@ export default function SilkHero() {
 
       // Sleep canvas when hero has completely zoomed out and faded to 0 opacity
       const scrollProgress = scrollYProgress ? scrollYProgress.get() : 0;
-      if (scrollProgress > 0.88) {
+      if (width >= 768 && scrollProgress > 0.88) {
         return;
       }
 
@@ -267,7 +270,7 @@ export default function SilkHero() {
         <motion.div
           style={
             isMobile
-              ? { scale: 1, opacity: 1 }
+              ? { scale: 1, opacity: 1, borderRadius: 0 }
               : {
                   scale: heroScale,
                   borderRadius: heroRadius,

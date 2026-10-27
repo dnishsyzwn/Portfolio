@@ -1,5 +1,7 @@
 "use client";
 
+import RollingButtonLabel from "@/components/RollingButtonLabel";
+
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Github, Linkedin, ArrowUpRight } from "lucide-react";
@@ -96,12 +98,9 @@ export default function Footer() {
             >
               <a
                 href="/contact"
-                className="group relative inline-flex items-center gap-3 px-6 py-3.5 sm:px-9 sm:py-5 rounded-full bg-[#1b4c78] hover:bg-[#0b1c2e] text-white font-sans text-sm sm:text-base md:text-lg font-medium shadow-[0_10px_25px_-5px_rgba(27,76,120,0.35)] hover:shadow-[0_15px_35px_-5px_rgba(11,28,46,0.45)] transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
+                className="group/roll group relative inline-flex items-center gap-3 px-6 py-3.5 sm:px-9 sm:py-5 rounded-full bg-[#1b4c78] hover:bg-[#2e5189] text-white font-sans text-sm sm:text-base md:text-lg font-medium shadow-[0_10px_25px_-5px_rgba(27,76,120,0.35)] hover:shadow-[0_15px_35px_-5px_rgba(11,28,46,0.45)] transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
               >
-                <span>Contact Me</span>
-                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/15 group-hover:bg-white/25 flex items-center justify-center transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  <ArrowUpRight className="w-4 h-4 text-white transition-transform duration-300 group-hover:rotate-45" />
-                </span>
+                <RollingButtonLabel text="Contact Me" />
               </a>
             </motion.div>
           </div>

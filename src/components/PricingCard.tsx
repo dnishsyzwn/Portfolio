@@ -1,8 +1,10 @@
 "use client";
 
+import RollingButtonLabel from "@/components/RollingButtonLabel";
+
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, ArrowUpRight } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export interface PricingCardData {
@@ -147,14 +149,13 @@ export default function PricingCard({ card, index }: PricingCardProps) {
           {/* Dark Pill CTA Button with Shimmer Sweep */}
           <Link
             href={`/contact?plan=${encodeURIComponent(card.title)}`}
-            className="group/btn relative w-full block text-center py-3.5 px-6 rounded-full bg-[#181a24]/90 hover:bg-[#202535] active:bg-[#14151e] border border-white/[0.18] hover:border-[#38bdf8]/50 shadow-[0_4px_18px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.25)] transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] overflow-hidden"
+            className="group/roll group/btn relative w-full block text-center py-3.5 px-6 rounded-full bg-[#181a24]/90 hover:bg-[#193c62] active:bg-[#14151e] border border-white/[0.18] hover:border-[#38bdf8]/50 shadow-[0_4px_18px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_25px_rgba(56,189,248,0.25)] transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] overflow-hidden"
           >
             {/* Shimmer sweep effect */}
             <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
 
             <span className="font-sans text-sm sm:text-base font-semibold text-white/95 tracking-normal inline-flex items-center justify-center gap-2 transition-transform duration-200">
-              <span>{card.buttonText}</span>
-              <ArrowUpRight className="w-4 h-4 text-white/60 group-hover/btn:text-[#38bdf8] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
+              <RollingButtonLabel text={card.buttonText} />
             </span>
           </Link>
 
