@@ -10,6 +10,13 @@ import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
+
+  if (pathname === "/catalogue") return null;
+
+  return <FooterContent />;
+}
+
+function FooterContent() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-80px" });
 
@@ -19,8 +26,6 @@ export default function Footer() {
   ];
 
   let cumulativeCharIdx = 0;
-
-  if (pathname === "/catalogue") return null;
 
   return (
     <footer id="contact" className="relative py-14 sm:py-20 px-5 sm:px-8 md:px-12 border-t border-[#1b4c78]/10 bg-white">
