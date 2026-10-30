@@ -64,11 +64,7 @@ const RUNWAY_VH   = 280;
 interface WorkContentProps {
   theme: "light" | "dark";
   x: MotionValue<number>;
-  trackOp: MotionValue<number>;
-  trackY: MotionValue<string>;
   progressWidth: MotionValue<string>;
-  headerY: MotionValue<string>;
-  headerOp: MotionValue<number>;
   catalogueActive: boolean;
   onCatalogueActive: (active: boolean) => void;
   trackRef?: React.RefObject<HTMLDivElement | null>;
@@ -77,11 +73,7 @@ interface WorkContentProps {
 function WorkContent({
   theme,
   x,
-  trackOp,
-  trackY,
   progressWidth,
-  headerY,
-  headerOp,
   catalogueActive,
   onCatalogueActive,
   trackRef,
@@ -120,7 +112,7 @@ function WorkContent({
     <div className={`w-full h-full flex flex-col justify-between ${palette.bg}`}>
       {/* ── Header ─────────────────────────────────────────────────── */}
       <motion.header
-        style={{ y: headerY, opacity: headerOp, borderBottomColor: palette.headerBorder }}
+        style={{ borderBottomColor: palette.headerBorder }}
         className="flex-none flex items-end justify-between gap-6 px-8 md:px-14 pt-[72px] pb-4 border-b"
       >
         <div>
@@ -149,8 +141,6 @@ function WorkContent({
           style={
             {
               x,
-              y: trackY,
-              opacity: trackOp,
               paddingLeft: `${TRACK_PAD}vw`,
               gap: `${GAP}vw`,
             } as unknown as React.CSSProperties
@@ -324,13 +314,7 @@ export default function WorkSection() {
     return -progress * maxShift;
   });
 
-  // Slow and smooth entrance fade-in
-  const trackOp = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
-  const trackY  = useTransform(scrollYProgress, [0, 0.15], ["28px", "0px"]);
-
   const progressWidth = useTransform(scrollYProgress, [0.14, 0.92], ["0%", "100%"]);
-  const headerY       = useTransform(scrollYProgress, [0, 0.12], ["16px", "0px"]);
-  const headerOp      = useTransform(scrollYProgress, [0, 0.10], [0, 1]);
 
   // "Scroll to start" indicator at start of the work section (fades out as runway moves)
   const scrollStartOp = useTransform(scrollYProgress, [0, 0.02, 0.12, 0.18], [0.95, 1, 1, 0]);
@@ -468,11 +452,7 @@ export default function WorkSection() {
               onCatalogueActive={setCatalogueActive}
               trackRef={trackRef}
               x={x}
-              trackOp={trackOp}
-              trackY={trackY}
               progressWidth={progressWidth}
-              headerY={headerY}
-              headerOp={headerOp}
             />
           </div>
 
@@ -487,11 +467,7 @@ export default function WorkSection() {
               catalogueActive={catalogueActive}
               onCatalogueActive={setCatalogueActive}
               x={x}
-              trackOp={trackOp}
-              trackY={trackY}
               progressWidth={progressWidth}
-              headerY={headerY}
-              headerOp={headerOp}
             />
           </motion.div>
 
